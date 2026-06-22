@@ -1,0 +1,11 @@
+.cache/
+.pytest_*
+.venv
+
+## We don't want to include assets/, the application should be source agnostic
+assets
+.env
+data/
+
+tmp/
+*.lock

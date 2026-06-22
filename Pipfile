@@ -1,0 +1,44 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+# --- Layer 0: model seam ---
+pydantic = ">=2"                         # LLMTextCompletionProgram validates structured output
+# --- Layer 1: document loading ---
+llama-index-core = "*"                   # chunking, pipeline, retrieval, structured output
+docling = "*"                            # HTML → Markdown (Constitution)
+pymupdf4llm = "*"                        # PDF → Markdown (Civil Code)
+# --- Layer 3: embedding + vector index ---
+llama-index-embeddings-ollama = "*"      # bge-m3 via Ollama native API
+chromadb = "*"                           # embedded vector store, no server
+llama-index-vector-stores-chroma = "*"   # LlamaIndex ↔ Chroma bridge
+llama-index-llms-ollama = "*"            # Ollama LLM — reasoning via native Ollama API
+# --- Layer 7: orchestration + API ---
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+flask = "*"
+llama-index-postprocessor-flag-embedding-reranker = "*"
+llama-index-embeddings-huggingface = "*"
+optimum = {extras = ["onnxruntime"], version = "*"}
+optimum-intel = {extras = ["openvino"], version = "*"}
+llama-index-llms-llama-cpp = "*"
+# --- Need  libopenblas-dev on debian
+# --- CMAKE_ARGS="-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS" pipenv run pip install llama-cpp-python --force-reinstall --no-cache-dir
+llama-cpp-python = "*"
+huggingface-hub = "*"
+llama-index-retrievers-bm25 = "*"
+
+[dev-packages]
+pytest = "*"
+
+[requires]
+python_version = "3.11"
+
+[scripts]
+start = "python ./main.py"
+test = "python -m pytest"
+
+[pipenv]
+allow_prereleases = true
