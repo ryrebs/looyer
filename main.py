@@ -69,7 +69,23 @@ def load_chunked_embed(path: str):
         )
     else:
         texts = transform_html_const(mk.content)
-    nodes = markdown_chunk_text(texts, mk.path, embed_model=_embed_model, llm=_llm)
+
+    _extractor_llm = LlamaCPP(
+        verbose=False,
+        model_path=os.getenv("EXTRACTOR_LLM_MODEL"),
+        temperature=0.1,
+        max_new_tokens=512,
+        context_window=4096,
+        model_kwargs={"n_threads": os.cpu_count() - 2},
+    )
+    try:
+        nodes = markdown_chunk_text(
+            texts, mk.path, embed_model=_embed_model, llm=_llm, extractor_llm=_extractor_llm
+        )
+    finally:
+        del _extractor_llm
+        gc.collect()
+
     build_index(nodes, embed_model=_embed_model)
 
 
