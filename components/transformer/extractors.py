@@ -46,6 +46,7 @@ JSON:"""
 
 class LegalMetadataExtractor(BaseExtractor):
     llm: Any = None
+    max_context_length: int = 600
 
     async def aextract(self, nodes: Sequence[BaseNode]) -> list[dict[str, Any]]:
         results = []
@@ -56,7 +57,7 @@ class LegalMetadataExtractor(BaseExtractor):
             headers = " > ".join(
                 v for k, v in node.metadata.items() if k.startswith("Header")
             )
-            context = node.get_content()[:600]
+            context = node.get_content()[:self.max_context_length]
             if headers:
                 context = f"Headers: {headers}\n\n{context}"
             prompt = _LEGAL_META_PROMPT.format(context=context)

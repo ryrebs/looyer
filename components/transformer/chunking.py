@@ -31,7 +31,13 @@ def get_pipeline_cache(file_name: str):
 
 
 def markdown_chunk_text(
-    text: str, source: str, embed_model=None, llm=None, extractor_llm=None, doc_meta: dict = None
+    text: str,
+    source: str,
+    embed_model=None,
+    llm=None,
+    extractor_llm=None,
+    extractor_context_length: int = 600,
+    doc_meta: dict = None,
 ) -> list[BaseNode]:
     """Chunk document using markdown structure and semantic splitting."""
 
@@ -42,7 +48,12 @@ def markdown_chunk_text(
     )
 
     # Custom extractor — uses dedicated extractor_llm when provided, falls back to llm
-    _custom_extractors = [LegalMetadataExtractor(llm=extractor_llm or llm)]
+    _custom_extractors = [
+        LegalMetadataExtractor(
+            llm=extractor_llm or llm,
+            max_context_length=extractor_context_length,
+        )
+    ]
 
     document = _to_document(text, source, doc_meta=doc_meta)
     transformations = [_markdown_parser, _semantic_splitter] + _custom_extractors
