@@ -8,6 +8,6 @@ from .transformer.extractors import (
 )
 from .indexer.index import build_index
 from .retrieval.retriever import retrieve
-from .synthesizer.text_completion import reason, irac_qa_template, irac_refine_template
 from .synthesizer.response_syn import rag_response_syn
+from .synthesizer.templates import irac_qa_template, irac_refine_template
 from .reranker.rerank import rerank

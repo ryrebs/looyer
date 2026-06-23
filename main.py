@@ -1,5 +1,6 @@
 import sys
 import os
+import gc
 
 from llama_index.core import Settings
 
@@ -14,7 +15,6 @@ from components import (
     _promote_articles,
     build_index,
     retrieve,
-    reason,
     rerank,
     rag_response_syn,
     irac_qa_template,
@@ -22,15 +22,12 @@ from components import (
 )
 
 
+import chromadb
 from pydantic import BaseModel, Field
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.llama_cpp import LlamaCPP
 from llama_index.core.schema import NodeWithScore, TextNode
 
-
-## We load and parse the sources or data
-# data = ["assets/civil_code.pdf", "assets/1987_const.html"]
-data = ["assets/1987_const.html"]
 
 ## Load models
 _embed_model = HuggingFaceEmbedding(
@@ -56,39 +53,41 @@ class ParseData(BaseModel):
     path: str = Field(default="", description="File path")
 
 
-def load_data():
-    all_data = []
-    for data_path in data:
-        if ".html" in data_path:
-            use_docling = True
-        else:
-            use_docling = False
-        all_data.append(
-            ParseData(
-                content=load_document(data_path, use_docling=use_docling),
-                path=data_path,
-            )
+def load_data(path: str) -> ParseData:
+    use_docling = ".html" in path
+    return ParseData(
+        content=load_document(path, use_docling=use_docling),
+        path=path,
+    )
+
+
+def load_chunked_embed(path: str):
+    mk = load_data(path)
+    if ".pdf" in mk.path:
+        texts = transform_mk_cv_code(
+            mk.content, [_clean_heading_markup, _promote_articles]
         )
-    return all_data
+    else:
+        texts = transform_html_const(mk.content)
+    nodes = markdown_chunk_text(texts, mk.path, embed_model=_embed_model, llm=_llm)
+    build_index(nodes, embed_model=_embed_model)
 
 
-def load_chunked_embed():
-    for mk in load_data():
-        if ".pdf" in mk.path:
-            texts = transform_mk_cv_code(
-                mk.content, [_clean_heading_markup, _promote_articles]
-            )
-        else:
-            texts = transform_html_const(mk.content)
-        nodes = markdown_chunk_text(texts, mk.path, embed_model=_embed_model, llm=_llm)
-        build_index(nodes, embed_model=_embed_model)
+def _collection_exists() -> bool:
+    try:
+        client = chromadb.PersistentClient(path=os.getenv("INDEX_DIR"))
+        client.get_collection(name=os.getenv("COLLECTION_NAME"))
+        return True
+    except Exception:
+        return False
 
 
-def run_rag_pipeline(query: str, index: bool = False) -> str:
-    if index:
-        load_chunked_embed()
-
+def run_rag_pipeline(query: str) -> str:
     nodes = retrieve(query, k=20, run_rerank=True, embed_model=_embed_model)
+    if not nodes:
+        print("No relevant documents found for your query.")
+        sys.exit(1)
+
     return rag_response_syn(
         nodes,
         query,
@@ -98,17 +97,35 @@ def run_rag_pipeline(query: str, index: bool = False) -> str:
     )
 
 
-if __name__ == "__main__":
-
-    def start():
-        question = " ".join(sys.argv[1:]) or "What are the rights of an accused person?"
-        answer = run_rag_pipeline(question, index=True)
-        print(f"\n{answer}")
-
-    start()
-
-    ## Manual cleanup
+def cleanup():
+    global _llm
     del _llm
-    import gc
-
     gc.collect()
+
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+
+    if not args:
+        print("Usage:")
+        print("  python main.py run-embed <path>   # index a document")
+        print("  python main.py <question>         # query the index")
+        cleanup()
+        sys.exit(0)
+    if args[0] == "run-embed":
+        if len(args) < 2:
+            print("Usage: python main.py run-embed <path>")
+            cleanup()
+            sys.exit(1)
+        print(f"Building index for {args[1]}...")
+        load_chunked_embed(args[1])
+        cleanup()
+        print("Done.")
+    else:
+        if not _collection_exists():
+            print("No index found. Run with 'run-embed' first to build the index.")
+            sys.exit(1)
+        question = " ".join(args)
+        answer = run_rag_pipeline(question)
+        cleanup()
+        print(f"\n{answer}")
