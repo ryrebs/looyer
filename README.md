@@ -28,7 +28,6 @@ QUERYING                                             │
 
 (More to come..)
 
-
 ### Getting started
 
 0. Populate .env based on env.sample
@@ -36,3 +35,19 @@ QUERYING                                             │
 1. Install dependencies: `pipenv install`
 
 2. Download models using: **get_hf_model.py**
+
+### Future optimizations
+
+- HierarchicalNodeParser for more hierarchy control when parsing
+
+- Multi domain index
+
+- Meta data filters during retrieval
+
+- Evaluation
+
+- Query caching
+
+- Guardrails
+
+- Security considerations

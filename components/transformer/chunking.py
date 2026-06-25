@@ -42,6 +42,10 @@ def markdown_chunk_text(
     """Chunk document using markdown structure and semantic splitting."""
 
     # Built-in LlamaIndex transformations
+
+    ## TODO Optimization: HierarchicalNodeParser
+    ## More control on how to parse hierarchy
+
     _markdown_parser = MarkdownNodeParser()
     _semantic_splitter = SemanticSplitterNodeParser(
         buffer_size=1, breakpoint_percentile_threshold=95, embed_model=embed_model

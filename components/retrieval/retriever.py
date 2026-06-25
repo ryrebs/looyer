@@ -52,6 +52,13 @@ def _load_retriever(k: int, embed_model: HuggingFaceEmbedding):
     collection = chroma_client.get_collection(name=os.getenv("COLLECTION_NAME"))
     vector_store = ChromaVectorStore(chroma_collection=collection)
 
+    ## TODO: Optimization using metadata filters
+    ## E.g. node.metadata["effective_date"] = "2024-01-15"
+    ## node.metadata["version"] = "RA-11934-amended-2024"
+    ## filters = MetadataFilters(filters=[
+    ##    MetadataFilter(key="effective_date", value="2024-01-15", operator="<=")
+    ## ])
+
     # Dense retriever — semantic similarity via bge-m3 vectors
     dense_retriever = VectorStoreIndex.from_vector_store(
         vector_store, embed_model=embed_model
@@ -87,6 +94,16 @@ def retrieve(
     Returns:
         List of NodeWithScore sorted by relevance (most relevant first).
     """
+
+    ## TODO: Optimization for multi domain indices we can use RouterRetriever
+    ## TODO: Optimization Hypothetical Document Embeddings. HyDEQueryTransform or creating manually.
+    ## Why?:
+    ## "When can an accused be released without bail?" — that question phrasing may land far
+    ## from the actual statute text in embedding space.
+    ## A hypothetical answer like "The accused may be released without bail
+    ## when the offense is not punishable by reclusion perpetua..."
+    ## lands much closer to the real statute.
+
     retriever = _load_retriever(k, embed_model)
     nodes = retriever.retrieve(question)
 
