@@ -6,6 +6,13 @@ Simple RAG pipeline for answering legal queries.
 
 ```
 INDEXING
+                   ┌─────────────────────────────────────────────┐
+                   │           AUDIT  components/audit/          │
+                   │  audit_current_chunks()  inspect_section()  │
+                   │  key = sorted(meta.items())                 │
+                   │  count > 1  →  atom fragmented              │
+                   └────────────────▲───────────────▲───────────┘
+                                    │               │
 ┌────────────┐     ┌─────────────────┐     ┌───────────────────┐
 │   loader/  │────▶│  transformer/   │────▶│    indexer/       │
 │load_document│    │ chunk + extract │     │ bge-m3 + ChromaDB │
