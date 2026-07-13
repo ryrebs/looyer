@@ -14,6 +14,8 @@ from components import (
     _clean_heading_markup,
     _promote_articles,
     build_index,
+    build_durable_storage_context,
+    build_index_from_durable_storage,
     retrieve,
     rerank,
     rag_response_syn,
@@ -23,6 +25,7 @@ from components import (
 
 
 import chromadb
+from qdrant_client import QdrantClient
 from pydantic import BaseModel, Field
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.llama_cpp import LlamaCPP
@@ -38,6 +41,11 @@ _embed_model = HuggingFaceEmbedding(
     },
 )
 
+
+def _saul_completion_to_prompt(completion: str) -> str:
+    return f"<s>[INST] {completion} [/INST]"
+
+
 _llm = LlamaCPP(
     verbose=False,
     model_path=os.getenv("LLM_MODEL"),
@@ -45,7 +53,12 @@ _llm = LlamaCPP(
     max_new_tokens=1024,
     context_window=8192,
     model_kwargs={"n_threads": os.cpu_count() - 2},
+    completion_to_prompt=_saul_completion_to_prompt,
 )
+COLLECTION_NAME = os.getenv("COLLECTION_NAME")
+EXTRACTOR_LLM_MODEL = os.getenv("EXTRACTOR_LLM_MODEL")
+INDEX_DIR = os.getenv("INDEX_DIR")
+QDRANT_URL = os.getenv("QDRANT_URL", "http://127.0.0.1:6333")
 
 
 class ParseData(BaseModel):
@@ -72,7 +85,7 @@ def load_chunked_embed(path: str):
 
     _extractor_llm = LlamaCPP(
         verbose=False,
-        model_path=os.getenv("EXTRACTOR_LLM_MODEL"),
+        model_path=EXTRACTOR_LLM_MODEL,
         temperature=0.1,
         max_new_tokens=512,
         context_window=4096,
@@ -80,26 +93,46 @@ def load_chunked_embed(path: str):
     )
     try:
         nodes = markdown_chunk_text(
-            texts, mk.path, embed_model=_embed_model, llm=_llm, extractor_llm=_extractor_llm
+            texts,
+            mk.path,
+            embed_model=_embed_model,
+            llm=_llm,
+            extractor_llm=_extractor_llm,
         )
     finally:
         del _extractor_llm
         gc.collect()
 
-    build_index(nodes, embed_model=_embed_model)
+    ## ChromaDB
+    # build_index(nodes, embed_model=_embed_model)
+
+    ## Qdrant
+    storage_context = build_durable_storage_context(collection_name=COLLECTION_NAME)
+    build_index_from_durable_storage(
+        nodes, embed_model=_embed_model, storage_context=storage_context
+    )
 
 
 def _collection_exists() -> bool:
     try:
-        client = chromadb.PersistentClient(path=os.getenv("INDEX_DIR"))
-        client.get_collection(name=os.getenv("COLLECTION_NAME"))
+        client = chromadb.PersistentClient(path=INDEX_DIR)
+        client.get_collection(name=COLLECTION_NAME)
         return True
     except Exception:
         return False
 
 
+def _qdrant_collection_exists() -> bool:
+    try:
+        client = QdrantClient(url=QDRANT_URL)
+        return client.collection_exists(COLLECTION_NAME)
+    except Exception as exc:
+        print(exc)
+        return False
+
+
 def run_rag_pipeline(query: str) -> str:
-    nodes = retrieve(query, k=20, run_rerank=True, embed_model=_embed_model)
+    nodes = retrieve(query, k=20, run_rerank=True, embed_model=_embed_model, llm=_llm)
     if not nodes:
         print("No relevant documents found for your query.")
         sys.exit(1)
@@ -137,9 +170,11 @@ if __name__ == "__main__":
         load_chunked_embed(args[1])
         cleanup()
         print("Done.")
+
     else:
-        if not _collection_exists():
+        if not _qdrant_collection_exists():
             print("No index found. Run with 'run-embed' first to build the index.")
+            cleanup()
             sys.exit(1)
         question = " ".join(args)
         answer = run_rag_pipeline(question)

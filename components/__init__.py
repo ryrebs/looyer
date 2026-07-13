@@ -6,7 +6,11 @@ from .transformer.extractors import (
     _clean_heading_markup,
     _promote_articles,
 )
-from .indexer.index import build_index
+from .indexer.index import (
+    build_index,
+    build_index_from_durable_storage,
+    build_durable_storage_context,
+)
 from .retrieval.retriever import retrieve
 from .synthesizer.response_syn import rag_response_syn
 from .synthesizer.templates import irac_qa_template, irac_refine_template

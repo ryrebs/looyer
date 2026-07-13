@@ -29,6 +29,7 @@ llama-index-llms-llama-cpp = "*"
 llama-cpp-python = "*"
 huggingface-hub = "*"
 llama-index-retrievers-bm25 = "*"
+llama-index-vector-stores-qdrant = "*"
 
 [dev-packages]
 pytest = "*"

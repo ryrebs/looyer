@@ -58,3 +58,13 @@ QUERYING                                             │
 - Guardrails
 
 - Security considerations
+
+## Qdrant
+
+```
+docker run -p 127.0.0.1:6333:6333 \
+  --rm \
+  --name looyer \
+  -v "$(pwd)/data/qdrant:/qdrant/storage:z" \
+  qdrant/qdrant
+```

@@ -9,6 +9,47 @@ import os
 import chromadb
 from llama_index.core.schema import BaseNode, MetadataMode
 
+from qdrant_client import QdrantClient
+from llama_index.vector_stores.qdrant import QdrantVectorStore
+from llama_index.core import StorageContext
+from llama_index.core import VectorStoreIndex
+
+
+def build_durable_storage_context(
+    qdrant_url: str = "http://127.0.0.1:6333",
+    collection_name: str = None,
+):
+    ## Qdrant scalable and production ready index storage
+    qdrant_client = QdrantClient(url=qdrant_url)
+    vector_store = QdrantVectorStore(
+        client=qdrant_client, collection_name=collection_name
+    )
+
+    return StorageContext.from_defaults(
+        vector_store=vector_store,
+    )
+
+
+def build_index_from_durable_storage(
+    nodes: list[BaseNode],
+    embed_model=None,
+    storage_context=None,
+    excluded_embed_metadata_keys=None,
+):
+    ## We want to exclude unnecessary metadata keys for embedding such as file name, file type etc..
+    if excluded_embed_metadata_keys:
+        for node in nodes:
+            node.excluded_embed_metadata_keys.extend(excluded_embed_metadata_keys)
+
+    ## Automatically embeds the nodes and store it
+    index = VectorStoreIndex(
+        nodes,
+        storage_context=storage_context,
+        embed_model=embed_model,
+        show_progress=True,
+    )
+    return index
+
 
 def build_index(nodes: list[BaseNode], embed_model=None) -> chromadb.Collection:
     """Embed nodes and persist them into a Chroma collection.
