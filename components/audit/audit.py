@@ -2,11 +2,38 @@ import os
 from collections import Counter
 
 import chromadb
+from qdrant_client import QdrantClient
+from llama_index.vector_stores.qdrant import QdrantVectorStore
+from llama_index.core.vector_stores.utils import metadata_dict_to_node
+
 
 
 def _get_collection():
     client = chromadb.PersistentClient(path=os.getenv("INDEX_DIR"))
     return client.get_collection(name=os.getenv("COLLECTION_NAME"))
+
+def _get_collection_from_qdrant():
+    qclient = QdrantClient(
+        url=os.getenv("QDRANT_URL", "http://127.0.0.1:6333"),
+        
+    )
+    vector_store = QdrantVectorStore(
+        client=qclient, collection_name=os.getenv("COLLECTION_NAME")
+    )
+    nodes = []
+    offset = None
+    while True:
+        records, offset = vector_store.client.scroll(
+            collection_name=vector_store.collection_name,
+            limit=256,
+            offset=offset,
+            with_payload=True,
+        )
+        nodes.extend(metadata_dict_to_node(record.payload) for record in records)
+        if offset is None:
+            break
+    return nodes
+
 
 
 # ─── GROUPING KEY ─────────────────────────────────────────────────────────────
@@ -48,17 +75,15 @@ def audit_current_chunks() -> Counter:
         # see fragmented atoms only
         fragmented = {k: v for k, v in counter.items() if v > 1}
     """
-    collection = _get_collection()
-    results = collection.get(include=["metadatas"])
-    metas = results["metadatas"]
+    nodes = _get_collection_from_qdrant()
 
-    if not metas:
+    if not nodes:
         print("Collection is empty — run ingestion first.")
         return Counter()
 
     counter = Counter()
-    for meta in metas:
-        counter[_grouping_key(meta)] += 1
+    for node in nodes:
+        counter[_grouping_key(node.metadata)] += 1
 
     return counter
 
@@ -75,15 +100,13 @@ def inspect_section(key: tuple, show_fragments: int = 10) -> None:
     Then pass the key directly:
         inspect_section(('assets/civil_code.pdf', '/CHAPTER 1 .../', 'Article 5'))
     """
-    collection = _get_collection()
-    results = collection.get(include=["documents", "metadatas"])
-    docs = results["documents"]
-    metas = results["metadatas"]
+    nodes = _get_collection_from_qdrant()
 
     matches = []
-    for doc, meta in zip(docs, metas):
-        if _grouping_key(meta) == key:
-            matches.append({"text": doc, "tokens": len(doc) // 4, "metadata": meta})
+    for node in nodes:
+        if _grouping_key(node.metadata) == key:
+            doc = node.get_content()
+            matches.append({"text": doc, "tokens": len(doc) // 4, "metadata": node.metadata})
 
     if not matches:
         print(f"No nodes found for key: {key}")
@@ -121,17 +144,39 @@ if __name__ == "__main__":
     for key, count in sorted(fragmented.items(), key=lambda x: -x[1])[:20]:
         print(f"  {count}x  {key}")
 
-    # To inspect a specific unit, copy a key from the output above and pass it:
+
+    ## Sample output:
+    # Total atoms  : 3766
+    # Fragmented   : 335
+    # Intact       : 3431
+
+    # Fragmented atoms (atom -> count):
+    # 20x  (('header_path', '/CHAPTER 1 General Provisions/'), ('source', './assets/civil_code.pdf'))
+    # 20x  (('header_path', '/SECTION 2/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf'))
+    # 16x  (('header_path', '/SECTION 2/'), ('source', './assets/civil_code.pdf'))
+    # 15x  (('header_path', '/Limited Partnership (n)/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf'))
+    # 12x  (('header_path', '/CONSTITUTION OF THE REPUBLIC OF THE PHILIPPINES/ARTICLE VII — EXECUTIVE DEPARTMENT/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/1987_const.html'))
+    # 12x  (('header_path', '/Obligations of the Agent/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf'))
+    # 12x  (('header_path', '/CHAPTER 4/'), ('source', './assets/civil_code.pdf'))
+    # 10x  (('header_path', '/CHAPTER 3 Prescription of Actions/'), ('source', './assets/civil_code.pdf'))
+    # 10x  (('chapter', 'Chapter 3'), ('header_path', '/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf'))
+    # 10x  (('header_path', '/CONSTITUTION OF THE REPUBLIC OF THE PHILIPPINES/ARTICLE VI — THE LEGISLATIVE DEPARTMENT/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/1987_const.html'))
+    # 10x  (('header_path', '/SECTION 1 Consent/'), ('source', './assets/civil_code.pdf'))
+    # 10x  (('header_path', '/SECTION 1 Obligations of the Partners Among Themselves/'), ('source', './assets/civil_code.pdf'))
+    # 10x  (('article_number', 'Section 3'), ('header_path', '/'), ('proviso_flag', False), ('section_header', 'SECTION 3'), ('source', './assets/civil_code.pdf'))
+    # 10x  (('header_path', '/CONSTITUTION OF THE REPUBLIC OF THE PHILIPPINES/ARTICLE XIII — SOCIAL JUSTICE AND HUMAN RIGHTS/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/1987_const.html'))
+    # 10x  (('article_number', 'Section 2'), ('header_path', '/'), ('proviso_flag', False), ('section_header', 'SECTION 2'), ('source', './assets/civil_code.pdf'))
+    # 10x  (('header_path', '/Obligations of the Partners with Regard to Third Persons/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf'))
+    # 10x  (('header_path', '/Article 1. This Act shall be known as the "Civil Code of the Philippines." (n)/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf'))
+    # 9x  (('header_path', '/SECTION 1 Obligations of the Partners Among Themselves/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf'))
+    # 9x  (('header_path', '/CHAPTER 2 Pledge/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf'))
+    # 9x  (('header_path', '/CHAPTER 1 General Provisions/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf'))
+
+
+    ## To inspect a specific unit, copy a key from the output above and pass it:
     inspect_section(
         (
-            ("book", "Book I: Persons"),
-            ("chapter", "Chapter 3"),
-            ("header_path", "/"),
-            ("is_amended", False),
-            ("is_repealed", False),
-            ("proviso_flag", False),
-            ("source", "assets/civil_code.pdf"),
-            ("title", "Title I: Civil Personality"),
+            ('header_path', '/CHAPTER 1 General Provisions/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf')
         ),
         show_fragments=30,
     )
