@@ -9,6 +9,10 @@ CACHE_DIR = os.environ.get("HF_CACHE_DIR", "./.cache/hf")
 # Single-file GGUF models
 gguf_models = [
     {
+        "repo_id":"bartowski/microsoft_Phi-4-reasoning-GGUF",
+        "filename": "microsoft_Phi-4-reasoning-Q4_K_M.gguf"
+    },
+    {
         "repo_id": "MaziyarPanahi/Saul-Instruct-v1-GGUF",
         "filename": "Saul-Instruct-v1.Q4_K_M.gguf",
     },
