@@ -68,3 +68,22 @@ docker run -p 127.0.0.1:6333:6333 \
   -v "$(pwd)/data/qdrant:/qdrant/storage:z" \
   qdrant/qdrant
 ```
+
+## Graphify (optional)
+
+Local knowledge graph of the codebase for AI coding assistants. Output goes to `graphify-out/` (gitignored).
+
+```
+# Install the skill and hooks for Claude Code
+pipenv run python -m graphify install --project
+
+# Generate the graph (local, no LLM)
+pipenv run python -m graphify update .
+
+# Update the graph after code changes (only changed files are re-parsed)
+pipenv run python -m graphify update .
+
+# Remove the skill and hooks, then delete the generated graph
+pipenv run python -m graphify uninstall --project
+rm -rf graphify-out/
+```

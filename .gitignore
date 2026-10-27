@@ -9,3 +9,8 @@ data/
 
 tmp/
 *.lock
+## graphify output (local knowledge graph)
+graphify-out/
+
+## Claude Code local setup (skills, hooks, settings)
+.claude/

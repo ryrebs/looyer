@@ -30,6 +30,7 @@ llama-cpp-python = "*"
 huggingface-hub = "*"
 llama-index-retrievers-bm25 = "*"
 llama-index-vector-stores-qdrant = "*"
+graphifyy = "*"
 
 [dev-packages]
 pytest = "*"

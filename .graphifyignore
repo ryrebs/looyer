@@ -1,0 +1,60 @@
+# graphify: files that must never be scanned or sent to an LLM.
+# Same syntax as .gitignore. Kept explicit so it does not depend on .gitignore.
+
+## Environment files
+.env
+.env.*
+*.env
+.envrc
+.envrc.*
+
+## Credential / key files
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.jks
+*.keystore
+*.kdbx
+id_rsa*
+id_dsa*
+id_ecdsa*
+id_ed25519*
+secring.*
+*.gpg
+
+## Credential stores and API key files
+*credentials*
+*secret*
+*apikey*
+*api_key*
+*api-key*
+service_account*.json
+service-account*.json
+.netrc
+.pgpass
+.htpasswd
+.npmrc
+.pypirc
+.git-credentials
+.boto
+
+## Credential directories
+secrets/
+.secrets/
+credentials/
+.ssh/
+.gnupg/
+.aws/
+.azure/
+.gcloud/
+.kube/
+.docker/
+.huggingface/
+
+## Local caches that may hold tokens (e.g. Hugging Face)
+.cache/
