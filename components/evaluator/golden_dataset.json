@@ -1,0 +1,411 @@
+{
+  "direct_lookup": [
+    {
+      "id": "dl-01",
+      "question": "What rights does an accused person have during custodial investigation?",
+      "reference_answer": "A person under investigation for the commission of an offense has the right to be informed of his right to remain silent and to have competent and independent counsel, preferably of his own choice; if he cannot afford counsel, he must be provided with one. These rights cannot be waived except in writing and in the presence of counsel. No torture, force, violence, threat, intimidation, or other means that vitiate free will may be used against him, and secret detention places, solitary, incommunicado, or similar forms of detention are prohibited. Any confession or admission obtained in violation of these rights is inadmissible in evidence against him. (Article III, Section 12, 1987 Constitution)",
+      "source_text": "Section 12. 1. Any person under investigation for the commission of an offense shall have the right to be informed of his right to remain silent and to have competent and independent counsel preferably of his own choice. If the person cannot afford the services of counsel, he must be provided with one. These rights cannot be waived except in writing and in the presence of counsel. 2. No torture, force, violence, threat, intimidation, or any other means which vitiate the free will shall be used against him. Secret detention places, solitary, incommunicado, or other similar forms of detention are prohibited. 3. Any confession or admission obtained in violation of this or Section 17 hereof shall be inadmissible in evidence against him. 4. The law shall provide for penal and civil sanctions for violations of this Section as well as compensation to the rehabilitation of victims of torture or similar practices, and their families.",
+      "expected_metadata": [
+        {
+          "source": "1987_const.html",
+          "article": "Article III",
+          "section": "Section 12"
+        }
+      ],
+      "verified": true,
+      "review_note": ""
+    },
+    {
+      "id": "dl-02",
+      "question": "Is every accused person entitled to bail before conviction?",
+      "reference_answer": "No. All persons shall, before conviction, be bailable by sufficient sureties, or be released on recognizance as may be provided by law, except those charged with offenses punishable by reclusion perpetua when evidence of guilt is strong. The right to bail is not impaired even when the privilege of the writ of habeas corpus is suspended, and excessive bail shall not be required. (Article III, Section 13, 1987 Constitution)",
+      "source_text": "Section 13. All persons, except those charged with offenses punishable by reclusion perpetua when evidence of guilt is strong, shall, before conviction, be bailable by sufficient sureties, or be released on recognizance as may be provided by law. The right to bail shall not be impaired even when the privilege of the writ of habeas corpus is suspended. Excessive bail shall not be required.",
+      "expected_metadata": [
+        {
+          "source": "1987_const.html",
+          "article": "Article III",
+          "section": "Section 13"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "dl-03",
+      "question": "What are the qualifications to become a Senator of the Philippines?",
+      "reference_answer": "A Senator must be a natural-born citizen of the Philippines and, on the day of the election, be at least thirty-five years of age, able to read and write, a registered voter, and a resident of the Philippines for not less than two years immediately preceding the day of the election. (Article VI, Section 3, 1987 Constitution)",
+      "source_text": "Section 3. No person shall be a Senator unless he is a natural-born citizen of the Philippines and, on the day of the election, is at least thirty-five years of age, able to read and write, a registered voter, and a resident of the Philippines for not less than two years immediately preceding the day of the election.",
+      "expected_metadata": [
+        {
+          "source": "1987_const.html",
+          "article": "Article VI",
+          "section": "Section 3"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "dl-04",
+      "question": "How long is the term of the President, and can the President run for re-election?",
+      "reference_answer": "The President is elected by direct vote of the people for a term of six years, beginning at noon on the thirtieth day of June next following the day of the election and ending at noon of the same date six years thereafter. The President is not eligible for any re-election. A person who has succeeded as President and has served as such for more than four years is not qualified for election to the same office at any time. (Article VII, Section 4, 1987 Constitution)",
+      "source_text": "Section 4. The President and the Vice-President shall be elected by direct vote of the people for a term of six years which shall begin at noon on the thirtieth day of June next following the day of the election and shall end at noon of the same date, six years thereafter. The President shall not be eligible for any re-election. No person who has succeeded as President and has served as such for more than four years shall be qualified for election to the same office at any time.",
+      "expected_metadata": [
+        {
+          "source": "1987_const.html",
+          "article": "Article VII",
+          "section": "Section 4"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "dl-05",
+      "question": "What are the qualifications to be appointed a Member of the Supreme Court?",
+      "reference_answer": "A Member of the Supreme Court must be a natural-born citizen of the Philippines, at least forty years of age, and must have been for fifteen years or more a judge of a lower court or engaged in the practice of law in the Philippines. As a Member of the Judiciary, he must also be a person of proven competence, integrity, probity, and independence. (Article VIII, Section 7, 1987 Constitution)",
+      "source_text": "Section 7. 1. No person shall be appointed Member of the Supreme Court or any lower collegiate court unless he is a natural-born citizen of the Philippines. A Member of the Supreme Court must be at least forty years of age, and must have been for fifteen years or more, a judge of a lower court or engaged in the practice of law in the Philippines. 2. The Congress shall prescribe the qualifications of judges of lower courts, but no person may be appointed judge thereof unless he is a citizen of the Philippines and a member of the Philippine Bar. 3. A Member of the Judiciary must be a person of proven competence, integrity, probity, and independence.",
+      "expected_metadata": [
+        {
+          "source": "1987_const.html",
+          "article": "Article VIII",
+          "section": "Section 7"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "dl-06",
+      "question": "How is a law repealed, and can disuse or custom excuse non-compliance with a law?",
+      "reference_answer": "Laws are repealed only by subsequent laws. Their violation or non-observance is not excused by disuse, or by custom or practice to the contrary. When the courts declare a law to be inconsistent with the Constitution, the law is void and the Constitution governs; and administrative or executive acts, orders, and regulations are valid only when they are not contrary to the laws or the Constitution. (Article 7, Civil Code)",
+      "source_text": "Article 7. Laws are repealed only by subsequent ones, and their violation or non-observance shall not be excused by disuse, or custom or practice to the contrary. When the courts declared a law to be inconsistent with the Constitution, the former shall be void and the latter shall govern. Administrative or executive acts, orders and regulations shall be valid only when they are not contrary to the laws or the Constitution. (5a)",
+      "expected_metadata": [
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 7"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "dl-07",
+      "question": "What standard of conduct must a person observe when exercising his rights and performing his duties?",
+      "reference_answer": "Every person must, in the exercise of his rights and in the performance of his duties, act with justice, give everyone his due, and observe honesty and good faith. (Article 19, Civil Code — Human Relations)",
+      "source_text": "Article 19. Every person must, in the exercise of his rights and in the performance of his duties, act with justice, give everyone his due, and observe honesty and good faith.",
+      "expected_metadata": [
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 19"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "dl-08",
+      "question": "What is the difference between juridical capacity and capacity to act?",
+      "reference_answer": "Juridical capacity is the fitness to be the subject of legal relations; it is inherent in every natural person and is lost only through death. Capacity to act is the power to do acts with legal effect; it is acquired and may be lost. (Article 37, Civil Code)",
+      "source_text": "Article 37. Juridical capacity, which is the fitness to be the subject of legal relations, is inherent in every natural person and is lost only through death. Capacity to act, which is the power to do acts with legal effect, is acquired and may be lost. (n)",
+      "expected_metadata": [
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 37"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "dl-09",
+      "question": "When is a foetus considered born for civil purposes?",
+      "reference_answer": "For civil purposes, the foetus is considered born if it is alive at the time it is completely delivered from the mother's womb. However, if the foetus had an intra-uterine life of less than seven months, it is not deemed born if it dies within twenty-four hours after its complete delivery from the maternal womb. (Article 41, Civil Code)",
+      "source_text": "Article 41. For civil purposes, the foetus is considered born if it is alive at the time it is completely delivered from the mother's womb. However, if the foetus had an intra-uterine life of less than seven months, it is not deemed born if it dies within twenty-four hours after its complete delivery from the maternal womb. (30a)",
+      "expected_metadata": [
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 41"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "dl-10",
+      "question": "What are the essential requisites of a contract?",
+      "reference_answer": "There is no contract unless the following requisites concur: (1) consent of the contracting parties; (2) an object certain which is the subject matter of the contract; and (3) the cause of the obligation which is established. (Article 1318, Civil Code)",
+      "source_text": "Article 1318. There is no contract unless the following requisites concur: (1) Consent of the contracting parties; (2) Object certain which is the subject matter of the contract; (3) Cause of the obligation which is established. (1261)",
+      "expected_metadata": [
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 1318"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    }
+  ],
+  "inference": [
+    {
+      "id": "inf-01",
+      "question": "Juan is a natural-born Filipino, a registered voter who can read and write, and has lived in the Philippines all his life. He turns 35 one week after election day. Can he run for Senator in that election?",
+      "reference_answer": "No. A Senator must be at least thirty-five years of age on the day of the election. Juan would be 34 on election day, so he does not qualify, even though he meets the other requirements (natural-born citizen, able to read and write, registered voter, resident for at least two years before the election). (Article VI, Section 3, 1987 Constitution)",
+      "source_text": "Section 3. No person shall be a Senator unless he is a natural-born citizen of the Philippines and, on the day of the election, is at least thirty-five years of age, able to read and write, a registered voter, and a resident of the Philippines for not less than two years immediately preceding the day of the election.",
+      "expected_metadata": [
+        {
+          "source": "1987_const.html",
+          "article": "Article VI",
+          "section": "Section 3"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "inf-02",
+      "question": "If the President suspends the privilege of the writ of habeas corpus because of a rebellion, can a person arrested for rebellion still ask for bail, and how long can he be detained without being charged?",
+      "reference_answer": "The suspension does not by itself take away the right to bail: the right to bail shall not be impaired even when the privilege of the writ is suspended. The usual exception still applies: persons charged with offenses punishable by reclusion perpetua when evidence of guilt is strong are not bailable. The suspension applies only to persons judicially charged for rebellion or offenses inherent in or directly connected with invasion, and a person arrested or detained during the suspension must be judicially charged within three days, otherwise he shall be released. Whether a particular rebellion charge falls under the reclusion perpetua exception depends on its penalty, which the indexed documents do not state. (Article III, Section 13; Article VII, Section 18, 1987 Constitution)",
+      "source_text": "Section 13. All persons, except those charged with offenses punishable by reclusion perpetua when evidence of guilt is strong, shall, before conviction, be bailable by sufficient sureties, or be released on recognizance as may be provided by law. The right to bail shall not be impaired even when the privilege of the writ of habeas corpus is suspended. Excessive bail shall not be required.\n\nSection 18. The President shall be the Commander-in-Chief of all armed forces of the Philippines and whenever it becomes necessary, he may call out such armed forces to prevent or suppress lawless violence, invasion or rebellion. In case of invasion or rebellion, when the public safety requires it, he may, for a period not exceeding sixty days, suspend the privilege of the writ of habeas corpus or place the Philippines or any part thereof under martial law. Within forty-eight hours from the proclamation of martial law or the suspension of the privilege of the writ of habeas corpus, the President shall submit a report in person or in writing to the Congress. The Congress, voting jointly, by a vote of at least a majority of all its Members in regular or special session, may revoke such proclamation or suspension, which revocation shall not be set aside by the President. Upon the initiative of the President, the Congress may, in the same manner, extend such proclamation or suspension for a period to be determined by the Congress, if the invasion or rebellion shall persist and public safety requires it. The Congress, if not in session, shall, within twenty-four hours following such proclamation or suspension, convene in accordance with its rules without need of a call. The Supreme Court may review, in an appropriate proceeding filed by any citizen, the sufficiency of the factual basis of the proclamation of martial law or the suspension of the privilege of the writ or the extension thereof, and must promulgate its decision thereon within thirty days from its filing. A state of martial law does not suspend the operation of the Constitution, nor supplant the functioning of the civil courts or legislative assemblies, nor authorize the conferment of jurisdiction on military courts and agencies over civilians where civil courts are able to function, nor automatically suspend the privilege of the writ. The suspension of the privilege of the writ shall apply only to persons judicially charged for rebellion or offenses inherent in or directly connected with invasion. During the suspension of the privilege of the writ, any person thus arrested or detained shall be judicially charged within three days, otherwise he shall be released.",
+      "expected_metadata": [
+        {
+          "source": "1987_const.html",
+          "article": "Article III",
+          "section": "Section 13"
+        },
+        {
+          "source": "1987_const.html",
+          "article": "Article VII",
+          "section": "Section 18"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "inf-03",
+      "question": "I lost my job and can't pay my credit card debt. Can I be jailed for not paying?",
+      "reference_answer": "No, not for the debt itself. The Constitution provides that no person shall be imprisoned for debt or non-payment of a poll tax. Non-payment of a debt alone is therefore not a ground for imprisonment; separate criminal liability (for example, for fraud) would come from other laws, which are not in the indexed documents. (Article III, Section 20, 1987 Constitution)",
+      "source_text": "Section 20. No person shall be imprisoned for debt or non-payment of a poll tax.",
+      "expected_metadata": [
+        {
+          "source": "1987_const.html",
+          "article": "Article III",
+          "section": "Section 20"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "inf-04",
+      "question": "I was acquitted for an act under a city ordinance. Can the prosecutor now charge me for the same act under a national law?",
+      "reference_answer": "No. If an act is punished by both a law and an ordinance, conviction or acquittal under either one bars another prosecution for the same act. The acquittal under the ordinance therefore bars prosecution under the national law for the same act. (Article III, Section 21, 1987 Constitution)",
+      "source_text": "Section 21. No person shall be twice put in jeopardy of punishment for the same offense. If an act is punished by a law and an ordinance, conviction or acquittal under either shall constitute a bar to another prosecution for the same act.",
+      "expected_metadata": [
+        {
+          "source": "1987_const.html",
+          "article": "Article III",
+          "section": "Section 21"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "inf-05",
+      "question": "Congress passes a law this year that makes a certain act a crime. Can I be prosecuted under it for doing that act last year, before the law existed?",
+      "reference_answer": "No. The Constitution prohibits ex post facto laws: a law cannot be enacted to punish an act that was not a crime when it was done. (Article III, Section 22, 1987 Constitution)",
+      "source_text": "Section 22. No ex post facto law or bill of attainder shall be enacted.",
+      "expected_metadata": [
+        {
+          "source": "1987_const.html",
+          "article": "Article III",
+          "section": "Section 22"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "inf-06",
+      "question": "Nobody in our town follows a certain national law, and I didn't even know it existed. Does that excuse me from complying with it?",
+      "reference_answer": "No, on both counts. Ignorance of the law excuses no one from compliance with it, and the violation or non-observance of a law is not excused by disuse, or by custom or practice to the contrary. A law stays in force until it is repealed by a subsequent law. (Articles 3 and 7, Civil Code)",
+      "source_text": "Article 3. Ignorance of the law excuses no one from compliance therewith. (2)\n\nArticle 7. Laws are repealed only by subsequent ones, and their violation or non-observance shall not be excused by disuse, or custom or practice to the contrary. When the courts declared a law to be inconsistent with the Constitution, the former shall be void and the latter shall govern. Administrative or executive acts, orders and regulations shall be valid only when they are not contrary to the laws or the Constitution. (5a)",
+      "expected_metadata": [
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 3"
+        },
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 7"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "inf-07",
+      "question": "A new law changes the rules for a type of contract. Does it apply to a contract I signed before the law took effect?",
+      "reference_answer": "Not unless the new law itself says so. Laws have no retroactive effect, unless the contrary is provided. (Article 4, Civil Code)",
+      "source_text": "Article 4. Laws shall have no retroactive effect, unless the contrary is provided. (3)",
+      "expected_metadata": [
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 4"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "inf-08",
+      "question": "A baby was born after six months of pregnancy and died eight hours after being completely delivered. For civil purposes, was the baby considered born?",
+      "reference_answer": "No. A foetus is generally considered born if it is alive when completely delivered, but a foetus with an intra-uterine life of less than seven months is not deemed born if it dies within twenty-four hours after complete delivery. Six months is less than seven, and eight hours is within twenty-four, so the baby is not deemed born for civil purposes. (Article 41, Civil Code)",
+      "source_text": "Article 41. For civil purposes, the foetus is considered born if it is alive at the time it is completely delivered from the mother's womb. However, if the foetus had an intra-uterine life of less than seven months, it is not deemed born if it dies within twenty-four hours after its complete delivery from the maternal womb. (30a)",
+      "expected_metadata": [
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 41"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "inf-09",
+      "question": "My neighbor carelessly damaged my car. We have no contract with each other. Can I make him pay for the damage?",
+      "reference_answer": "Yes. Whoever by act or omission causes damage to another, there being fault or negligence, is obliged to pay for the damage done. When there is no pre-existing contractual relation between the parties, this is a quasi-delict. If the damage was caused by your neighbor's negligence, he is obliged to pay for it. (Article 2176, Civil Code)",
+      "source_text": "Article 2176. Whoever by act or omission causes damage to another, there being fault or negligence, is obliged to pay for the damage done. Such fault or negligence, if there is no pre-existing contractual relation between the parties, is called a quasi-delict and is governed by the provisions of this Chapter. (1902a)",
+      "expected_metadata": [
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 2176"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "inf-10",
+      "question": "Is a contract valid if one party is paid to do something illegal?",
+      "reference_answer": "No. Cause is one of the requisites of a contract, and contracts with an unlawful cause produce no effect whatever. A cause is unlawful if it is contrary to law, morals, good customs, public order or public policy, so a contract to be paid for doing something illegal has no effect. (Articles 1318 and 1352, Civil Code)",
+      "source_text": "Article 1318. There is no contract unless the following requisites concur: - (1) Consent of the contracting parties; - (2) Object certain which is the subject matter of the contract; - (3) Cause of the obligation which is established. (1261)\n\nArticle 1352. Contracts without cause, or with unlawful cause, produce no effect whatever. The cause is unlawful if it is contrary to law, morals, good customs, public order or public policy. (1275a)",
+      "expected_metadata": [
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 1318"
+        },
+        {
+          "source": "civil_code.pdf",
+          "article": "Article 1352"
+        }
+      ],
+      "verified": false,
+      "review_note": ""
+    }
+  ],
+  "negative": [
+    {
+      "id": "neg-01",
+      "question": "How long is the term of office of a barangay captain?",
+      "reference_answer": "Not established in the indexed documents. Article X, Section 8 of the 1987 Constitution sets a three-year term for elective local officials but expressly excludes barangay officials, whose term \"shall be determined by law\". That law is not in the indexed documents.",
+      "source_text": null,
+      "expected_metadata": [],
+      "near_source": "1987_const.html",
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "neg-02",
+      "question": "What is the penalty for a government official who does not file a statement of assets, liabilities and net worth (SALN)?",
+      "reference_answer": "Not established in the indexed documents. Article XI, Section 17 of the 1987 Constitution requires public officers and employees to submit a declaration under oath of their assets, liabilities, and net worth, but it does not set a penalty for failing to do so.",
+      "source_text": null,
+      "expected_metadata": [],
+      "near_source": "1987_const.html",
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "neg-03",
+      "question": "What is the current minimum wage in Metro Manila?",
+      "reference_answer": "Not established in the indexed documents. The Constitution entitles workers to a living wage (Article XIII, Section 3), and the Civil Code lets a laborer recover the deficiency when paid below a minimum wage set by law (Article 1419), but neither document states the amount of any minimum wage.",
+      "source_text": null,
+      "expected_metadata": [],
+      "near_source": "1987_const.html",
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "neg-04",
+      "question": "What is the penalty for illegally wiretapping someone's phone calls?",
+      "reference_answer": "Not established in the indexed documents. Article III, Section 3 of the 1987 Constitution makes the privacy of communication inviolable except upon lawful order of the court (or when public safety or order requires otherwise, as prescribed by law), and makes evidence obtained in violation inadmissible, but it does not set a criminal penalty.",
+      "source_text": null,
+      "expected_metadata": [],
+      "near_source": "1987_const.html",
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "neg-05",
+      "question": "How many days is a search warrant valid after it is issued?",
+      "reference_answer": "Not established in the indexed documents. Article III, Section 2 of the 1987 Constitution requires probable cause determined personally by the judge and a particular description of the place to be searched and the things to be seized, but it does not state how long a search warrant remains valid.",
+      "source_text": null,
+      "expected_metadata": [],
+      "near_source": "1987_const.html",
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "neg-06",
+      "question": "By how much can my landlord increase the monthly rent of my apartment each year?",
+      "reference_answer": "Not established in the indexed documents. The Civil Code's provisions on lease do not set a limit on rent increases.",
+      "source_text": null,
+      "expected_metadata": [],
+      "near_source": "civil_code.pdf",
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "neg-07",
+      "question": "What is the estate tax rate when I inherit property from my parents?",
+      "reference_answer": "Not established in the indexed documents. The Civil Code governs succession (who inherits and in what shares), but neither document sets estate or inheritance tax rates.",
+      "source_text": null,
+      "expected_metadata": [],
+      "near_source": "civil_code.pdf",
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "neg-08",
+      "question": "What is the maximum amount I can claim in a small claims case?",
+      "reference_answer": "Not established in the indexed documents. Neither document mentions small claims cases.",
+      "source_text": null,
+      "expected_metadata": [],
+      "near_source": "civil_code.pdf",
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "neg-09",
+      "question": "What is the penalty for issuing a check that bounces?",
+      "reference_answer": "Not established in the indexed documents. Neither document sets a penalty for issuing a bouncing check. An answer that concludes from Article III, Section 20 of the Constitution (no imprisonment for debt) that no penalty applies goes beyond what the documents say.",
+      "source_text": null,
+      "expected_metadata": [],
+      "near_source": "civil_code.pdf",
+      "verified": false,
+      "review_note": ""
+    },
+    {
+      "id": "neg-10",
+      "question": "How much separation pay is an employee entitled to when laid off due to redundancy?",
+      "reference_answer": "Not established in the indexed documents. The Civil Code's provisions on labor do not set separation pay, and the Constitution mentions separation pay only for government employees separated as a result of the 1986 reorganization (Article XVIII, Section 16, Transitory Provisions).",
+      "source_text": null,
+      "expected_metadata": [],
+      "near_source": "civil_code.pdf",
+      "verified": false,
+      "review_note": ""
+    }
+  ]
+}

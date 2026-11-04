@@ -7,7 +7,7 @@ from llama_index.core.node_parser import MarkdownNodeParser, SemanticSplitterNod
 from llama_index.core.schema import BaseNode
 from llama_index.core.ingestion import IngestionPipeline, IngestionCache
 
-from .extractors import LegalMetadataExtractor
+from .extractors import LegalHeadingExtractor
 
 
 def _to_document(text: str, source: str, doc_meta: dict = None) -> Document:
@@ -34,9 +34,6 @@ def markdown_chunk_text(
     text: str,
     source: str,
     embed_model=None,
-    llm=None,
-    extractor_llm=None,
-    extractor_context_length: int = 600,
     doc_meta: dict = None,
 ) -> list[BaseNode]:
     """Chunk document using markdown structure and semantic splitting."""
@@ -51,16 +48,14 @@ def markdown_chunk_text(
         buffer_size=1, breakpoint_percentile_threshold=95, embed_model=embed_model
     )
 
-    # Custom extractor — uses dedicated extractor_llm when provided, falls back to llm
-    _custom_extractors = [
-        LegalMetadataExtractor(
-            llm=extractor_llm or llm,
-            max_context_length=extractor_context_length,
-        )
-    ]
 
     document = _to_document(text, source, doc_meta=doc_meta)
-    transformations = [_markdown_parser, _semantic_splitter] + _custom_extractors
+    # Citation metadata (article/section) is read from headings before the splitter cuts them off
+    transformations = [
+        _markdown_parser,
+        LegalHeadingExtractor(),
+        _semantic_splitter,
+    ]
 
     file_name = source.split("/")[-1]
     cache, cache_dir = get_pipeline_cache(file_name)

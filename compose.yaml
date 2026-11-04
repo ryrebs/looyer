@@ -1,0 +1,116 @@
+# Local services for Looyer: vector store, two OpenAI-compatible LLM servers, embeddings.
+# The app runs on the host and reaches them through .env (QDRANT_URL, {ROLE}_API_BASE,
+# EMBED_API_BASE).
+#
+#   docker compose up -d                 # all four
+#   docker compose up -d qdrant          # indexing only (no LLM needed)
+#   docker compose ps                    # STATUS shows (healthy) once a model is loaded
+#   docker compose exec embed ollama pull bge-m3   # once, after the first start of embed
+#
+# Ports are bound to 127.0.0.1 only: none of these services has authentication.
+#
+# Machine-specific values (volume host paths, CPU threads) come from .env; see env.sample.
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.18.2
+    container_name: looyer-qdrant
+    ports:
+      - "127.0.0.1:6333:6333"
+    volumes:
+      - ${HOST_QDRANT_DIR:?set HOST_QDRANT_DIR in .env}:/qdrant/storage:z
+    restart: unless-stopped
+
+  # Role: answer (reasoning model)
+  answer:
+    image: ghcr.io/ggml-org/llama.cpp:server-b11706
+    container_name: looyer-answer
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      # Whole HF cache: snapshot files are symlinks into its blobs/ folder
+      - ${HOST_HF_CACHE_DIR:?set HOST_HF_CACHE_DIR in .env}:/models:ro,z
+      - ${HOST_LLM_CONFIG_DIR:?set HOST_LLM_CONFIG_DIR in .env}:/config:ro,z
+    command:
+      - -m
+      - /models/models--bartowski--microsoft_Phi-4-reasoning-GGUF/snapshots/31acd2bdedae7114e095a73bd3d14a026f85bd71/microsoft_Phi-4-reasoning-Q4_K_M.gguf
+      - --alias
+      - phi-4-reasoning
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --ctx-size
+      - "16384"
+      - --parallel
+      - "1"
+      - --threads
+      - ${LLM_THREADS:?set LLM_THREADS in .env}
+      - --jinja
+      - --chat-template-file
+      - /config/phi-4-reasoning.jinja
+      - --reasoning-format
+      - deepseek
+      - --reasoning-budget
+      - "4096"
+      - --top-k
+      - "50"
+      - --repeat-penalty
+      - "1.1"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      # Loading a 9 GB model from disk can take minutes
+      start_period: 5m
+    restart: unless-stopped
+
+  # Role: hyde (small instruct model, no reasoning)
+  hyde_extractor:
+    image: ghcr.io/ggml-org/llama.cpp:server-b11706
+    container_name: looyer-hyde-extractor
+    ports:
+      - "127.0.0.1:8081:8080"
+    volumes:
+      - ${HOST_HF_CACHE_DIR:?set HOST_HF_CACHE_DIR in .env}:/models:ro,z
+    command:
+      - -m
+      - /models/models--lmstudio-community--Qwen3-4B-Instruct-2507-GGUF/snapshots/4edb920b6f14e3b9284d4502a6485103d72cde05/Qwen3-4B-Instruct-2507-Q4_K_M.gguf
+      - --alias
+      - qwen3-4b-instruct
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --ctx-size
+      - "4096"
+      - --parallel
+      - "1"
+      - --threads
+      - ${LLM_THREADS:?set LLM_THREADS in .env}
+      - --top-k
+      - "20"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 2m
+    restart: unless-stopped
+
+  # Role: embeddings (Ollama, /api/embed). Used only when EMBED_API_BASE is set.
+  embed:
+    image: ollama/ollama:0.40.13
+    container_name: looyer-embed
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ${HOST_OLLAMA_DIR:?set HOST_OLLAMA_DIR in .env}:/root/.ollama:z
+    healthcheck:
+      # The image has no curl
+      test: ["CMD", "ollama", "list"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped

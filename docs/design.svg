@@ -1,0 +1,206 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1010" viewBox="0 0 1200 1010" font-family="Helvetica, Arial, sans-serif">
+  <title>RAG: a bird's-eye view</title>
+  <style>
+    .h { font-size: 26px; font-weight: 700; fill: #1f2328; }
+    .sub { font-size: 14px; fill: #57606a; }
+    .sec { font-size: 15px; font-weight: 700; fill: #1f2328; letter-spacing: 0.5px; }
+    .note { font-size: 12px; fill: #6e7781; }
+    .bt { font-size: 14px; font-weight: 700; fill: #1f2328; }
+    .b { font-size: 12px; fill: #32383f; }
+    .p { font-size: 12px; fill: #6e7781; font-style: italic; }
+    .tag { font-size: 10px; fill: #6e7781; font-weight: 700; letter-spacing: 0.3px; }
+    .star { fill: #8a5cc7; }
+    .rules { fill: #e8f0fe; stroke: #4a7bd0; }
+    .model { fill: #f1e8fd; stroke: #8a5cc7; }
+    .llm { fill: #fff1e0; stroke: #d9822b; }
+    .store { fill: #e6f4ea; stroke: #3b8f5a; }
+    .io { fill: #f3f4f6; stroke: #57606a; }
+    .prac { fill: #fff8c5; stroke: #bf8700; }
+    .plan { fill: #fafafa; stroke: #9aa0a6; stroke-dasharray: 6 4; }
+    rect { stroke-width: 1.5; }
+    .arrow { stroke: #57606a; stroke-width: 1.8; fill: none; marker-end: url(#head); }
+  </style>
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#57606a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="1010" fill="#ffffff" stroke="none"/>
+  <text x="40" y="48" class="h">RAG: answer from your documents, not from memory</text>
+  <text x="40" y="74" class="sub">Retrieval-Augmented Generation: first retrieve the relevant passages, then have the LLM answer only from them, with citations.</text>
+  <text x="40" y="112" class="sec">1 · INDEXING</text>
+  <text x="160" y="112" class="note">offline · runs when documents change · must be re-runnable</text>
+  <rect x="40" y="128" width="130" height="130" rx="10" class="io"/>
+  <text x="52" y="150" class="bt">Documents</text>
+  <text x="52" y="170" class="b">PDF, HTML, DOCX</text>
+  <text x="52" y="190" class="p">Your source</text>
+  <text x="52" y="206" class="p">of truth.</text>
+  <rect x="207" y="128" width="210" height="130" rx="10" class="rules"/>
+  <text x="219" y="150" class="bt">Parsing</text>
+  <text x="219" y="170" class="b">File → text with structure</text>
+  <text x="219" y="186" class="b">(headings, lists, tables).</text>
+  <text x="219" y="206" class="p">Why: search needs text; headings</text>
+  <text x="219" y="222" class="p">tell where a passage belongs,</text>
+  <text x="219" y="238" class="p">which citations depend on.</text>
+  <rect x="454" y="128" width="210" height="130" rx="10" class="rules"/>
+  <text x="466" y="150" class="bt">Chunking + metadata</text>
+  <text x="466" y="170" class="b">Split at headings, then by size.</text>
+  <text x="466" y="186" class="b">Attach doc ID, section, page.</text>
+  <text x="466" y="206" class="p">Why: LLM input is limited and</text>
+  <text x="466" y="222" class="p">paid; small units match more</text>
+  <text x="466" y="238" class="p">precisely.</text>
+  <rect x="701" y="128" width="210" height="130" rx="10" class="model"/>
+  <text x="713" y="150" class="bt">Embedding <tspan class="star">★</tspan></text>
+  <text x="713" y="170" class="b">Chunk → vector of numbers</text>
+  <text x="713" y="186" class="b">(embedding model).</text>
+  <text x="713" y="206" class="p">Why: code can't compare meaning</text>
+  <text x="713" y="222" class="p">but can measure distance:</text>
+  <text x="713" y="238" class="p">similar meaning → nearby.</text>
+  <rect x="948" y="128" width="210" height="130" rx="10" class="store"/>
+  <text x="960" y="150" class="bt">Vector store</text>
+  <text x="960" y="170" class="b">Vector + text + metadata;</text>
+  <text x="960" y="186" class="b">finds nearest vectors fast.</text>
+  <text x="960" y="206" class="p">Why: comparing against every</text>
+  <text x="960" y="222" class="p">chunk doesn't scale.</text>
+  <path d="M170,193 L207,193" class="arrow"/>
+  <path d="M417,193 L454,193" class="arrow"/>
+  <path d="M664,193 L701,193" class="arrow"/>
+  <path d="M911,193 L948,193" class="arrow"/>
+  <rect x="948" y="285" width="210" height="90" rx="10" class="store"/>
+  <text x="960" y="307" class="bt">BM25 index</text>
+  <text x="1148" y="305" class="tag" text-anchor="end">recommended</text>
+  <text x="960" y="327" class="b">Keyword index; rare words</text>
+  <text x="960" y="343" class="b">weigh more.</text>
+  <text x="960" y="363" class="p">Why: embeddings blur exact IDs.</text>
+  <path d="M559,258 L559,325 L948,325" class="arrow"/>
+  <text x="40" y="300" class="bt">Make it re-runnable</text>
+  <text x="40" y="320" class="note">Stable chunk IDs + upsert (no duplicates). Replace a</text>
+  <text x="40" y="336" class="note">changed document in one step. A manifest (embedding</text>
+  <text x="40" y="352" class="note">model, chunker, parser) is checked at query time.</text>
+  <text x="40" y="410" class="sec">2 · QUERY</text>
+  <text x="140" y="410" class="note">online · per question · dashed = optional, add only when evaluation shows it helps</text>
+  <rect x="40" y="425" width="130" height="150" rx="10" class="io"/>
+  <text x="52" y="447" class="bt">Question</text>
+  <text x="52" y="467" class="b">From the user.</text>
+  <rect x="207" y="425" width="210" height="150" rx="10" class="plan"/>
+  <text x="219" y="447" class="bt">Query transform</text>
+  <text x="407" y="445" class="tag" text-anchor="end">optional</text>
+  <text x="219" y="467" class="b">e.g. HyDE: an LLM drafts an</text>
+  <text x="219" y="483" class="b">answer; search with that.</text>
+  <text x="219" y="503" class="p">Why: questions and documents</text>
+  <text x="219" y="519" class="p">use different words; a draft</text>
+  <text x="219" y="535" class="p">looks like the document.</text>
+  <rect x="454" y="425" width="210" height="70" rx="10" class="model"/>
+  <text x="466" y="447" class="bt">Dense retrieval <tspan class="star">★</tspan></text>
+  <text x="466" y="467" class="b">Embed question, nearest k.</text>
+  <text x="466" y="483" class="p">By meaning. Access filters here.</text>
+  <rect x="454" y="505" width="210" height="70" rx="10" class="store"/>
+  <text x="466" y="527" class="bt">BM25 retrieval</text>
+  <text x="654" y="525" class="tag" text-anchor="end">recommended</text>
+  <text x="466" y="547" class="b">Keyword search, same question.</text>
+  <text x="466" y="563" class="p">Exact terms: IDs, names, codes.</text>
+  <rect x="701" y="425" width="210" height="150" rx="10" class="rules"/>
+  <text x="713" y="447" class="bt">Fusion (RRF)</text>
+  <text x="713" y="467" class="b">Merge both lists by rank</text>
+  <text x="713" y="483" class="b">position; keep top 20–50.</text>
+  <text x="713" y="503" class="p">Why: the two score scales</text>
+  <text x="713" y="519" class="p">can't be compared; ranks can.</text>
+  <rect x="948" y="425" width="210" height="150" rx="10" class="model"/>
+  <text x="960" y="447" class="bt">Reranking</text>
+  <text x="1148" y="445" class="tag" text-anchor="end">recommended</text>
+  <text x="960" y="467" class="b">Cross-encoder reads question</text>
+  <text x="960" y="483" class="b">+ chunk together; keep 3–8.</text>
+  <text x="960" y="503" class="p">Why: vectors are fast but lossy;</text>
+  <text x="960" y="519" class="p">reading both together is</text>
+  <text x="960" y="535" class="p">accurate but slow.</text>
+  <path d="M170,500 L207,500" class="arrow"/>
+  <path d="M417,460 L454,460" class="arrow"/>
+  <path d="M417,540 L454,540" class="arrow"/>
+  <path d="M664,460 L701,480" class="arrow"/>
+  <path d="M664,540 L701,520" class="arrow"/>
+  <path d="M911,500 L948,500" class="arrow"/>
+  <path d="M1053,575 L1053,615" class="arrow"/>
+  <rect x="948" y="615" width="210" height="130" rx="10" class="rules"/>
+  <text x="960" y="637" class="bt">Refusal gate</text>
+  <text x="960" y="657" class="b">Best score too low →</text>
+  <text x="960" y="673" class="b">"not found", skip the LLM.</text>
+  <text x="960" y="693" class="p">Why: an LLM given weak</text>
+  <text x="960" y="709" class="p">evidence fills the gap with</text>
+  <text x="960" y="725" class="p">plausible text.</text>
+  <rect x="701" y="615" width="210" height="130" rx="10" class="rules"/>
+  <text x="713" y="637" class="bt">Prompt assembly</text>
+  <text x="713" y="657" class="b">Instructions + chunks with IDs</text>
+  <text x="713" y="673" class="b">+ question.</text>
+  <text x="713" y="693" class="p">Why: the LLM can only use and</text>
+  <text x="713" y="709" class="p">cite what it is given. Chunk</text>
+  <text x="713" y="725" class="p">text is data, not instructions.</text>
+  <rect x="454" y="615" width="210" height="130" rx="10" class="llm"/>
+  <text x="466" y="637" class="bt">Generation</text>
+  <text x="466" y="657" class="b">The LLM writes the answer</text>
+  <text x="466" y="673" class="b">with citations.</text>
+  <text x="466" y="693" class="p">Why: turns evidence into an</text>
+  <text x="466" y="709" class="p">answer. Set max tokens,</text>
+  <text x="466" y="725" class="p">timeouts, retries.</text>
+  <rect x="207" y="615" width="210" height="130" rx="10" class="rules"/>
+  <text x="219" y="637" class="bt">Output validation</text>
+  <text x="219" y="657" class="b">Check in code: cited IDs</text>
+  <text x="219" y="673" class="b">exist, quotes are verbatim.</text>
+  <text x="219" y="693" class="p">Why: prompts are requests, not</text>
+  <text x="219" y="709" class="p">guarantees. Fail → retry once,</text>
+  <text x="219" y="725" class="p">then refuse.</text>
+  <rect x="40" y="615" width="130" height="130" rx="10" class="io"/>
+  <text x="52" y="637" class="bt">Answer</text>
+  <text x="52" y="657" class="b">With citations,</text>
+  <text x="52" y="673" class="b">or "not found".</text>
+  <path d="M948,680 L911,680" class="arrow"/>
+  <path d="M701,680 L664,680" class="arrow"/>
+  <path d="M454,680 L417,680" class="arrow"/>
+  <path d="M207,680 L170,680" class="arrow"/>
+  <text x="40" y="788" class="sec">3 · AROUND BOTH PIPELINES</text>
+  <text x="300" y="788" class="note">what makes it production-grade instead of a demo</text>
+  <rect x="40" y="802" width="214" height="104" rx="10" class="prac"/>
+  <text x="52" y="824" class="bt">Evaluation</text>
+  <text x="52" y="844" class="b">30–100 real questions with</text>
+  <text x="52" y="860" class="b">expected passages, incl.</text>
+  <text x="52" y="876" class="b">unanswerable ones. Run on</text>
+  <text x="52" y="892" class="b">every change.</text>
+  <rect x="266" y="802" width="214" height="104" rx="10" class="prac"/>
+  <text x="278" y="824" class="bt">Observability</text>
+  <text x="278" y="844" class="b">Per question: retrieved IDs,</text>
+  <text x="278" y="860" class="b">scores, prompt version,</text>
+  <text x="278" y="876" class="b">model, tokens, latency</text>
+  <text x="278" y="892" class="b">per stage.</text>
+  <rect x="492" y="802" width="214" height="104" rx="10" class="prac"/>
+  <text x="504" y="824" class="bt">Security</text>
+  <text x="504" y="844" class="b">Access filters at retrieval.</text>
+  <text x="504" y="860" class="b">Retrieved text is untrusted.</text>
+  <text x="504" y="876" class="b">Rate limits, spend caps,</text>
+  <text x="504" y="892" class="b">secrets out of code.</text>
+  <rect x="718" y="802" width="214" height="104" rx="10" class="prac"/>
+  <text x="730" y="824" class="bt">Reliability</text>
+  <text x="730" y="844" class="b">Timeouts, retries with</text>
+  <text x="730" y="860" class="b">backoff, and a fallback</text>
+  <text x="730" y="876" class="b">for every external call.</text>
+  <rect x="944" y="802" width="214" height="104" rx="10" class="prac"/>
+  <text x="956" y="824" class="bt">Reproducibility</text>
+  <text x="956" y="844" class="b">Pinned libraries, models</text>
+  <text x="956" y="860" class="b">and prompts. Index manifest.</text>
+  <text x="956" y="876" class="b">Same input → same index.</text>
+  <rect x="40" y="929" width="22" height="14" rx="3" class="rules"/>
+  <text x="70" y="940" class="note">Code / rules (deterministic)</text>
+  <rect x="275" y="929" width="22" height="14" rx="3" class="model"/>
+  <text x="305" y="940" class="note">Small ML model</text>
+  <rect x="420" y="929" width="22" height="14" rx="3" class="llm"/>
+  <text x="450" y="940" class="note">LLM</text>
+  <rect x="495" y="929" width="22" height="14" rx="3" class="store"/>
+  <text x="525" y="940" class="note">Storage</text>
+  <rect x="595" y="929" width="22" height="14" rx="3" class="io"/>
+  <text x="625" y="940" class="note">Input / output</text>
+  <rect x="740" y="929" width="22" height="14" rx="3" class="prac"/>
+  <text x="770" y="940" class="note">Production practice</text>
+  <rect x="917" y="929" width="22" height="14" rx="3" class="plan"/>
+  <text x="947" y="940" class="note">Optional</text>
+  <text x="40" y="972" class="b"><tspan class="star">★</tspan> <tspan font-weight="700">One rule:</tspan> the embedding model must be identical at indexing and query time. A mismatch raises no error; retrieval just quietly gets worse.</text>
+  <text x="40" y="992" class="b"><tspan font-weight="700">Design consequence:</tspan> answer quality is capped by retrieval quality. Measure retrieval first.</text>
+</svg>

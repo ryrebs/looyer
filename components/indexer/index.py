@@ -9,20 +9,17 @@ import os
 import chromadb
 from llama_index.core.schema import BaseNode, MetadataMode
 
-from qdrant_client import QdrantClient
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core import StorageContext
 from llama_index.core import VectorStoreIndex
 
+from ..vector_store.config import build_qdrant_client
 
-def build_durable_storage_context(
-    qdrant_url: str = "http://127.0.0.1:6333",
-    collection_name: str = None,
-):
-    ## Qdrant scalable and production ready index storage
-    qdrant_client = QdrantClient(url=qdrant_url)
+
+def build_durable_storage_context(collection_name: str, client=None):
+    ## Qdrant scalable and production ready index storage; local Docker or Cloud from .env
     vector_store = QdrantVectorStore(
-        client=qdrant_client, collection_name=collection_name
+        client=client or build_qdrant_client(), collection_name=collection_name
     )
 
     return StorageContext.from_defaults(

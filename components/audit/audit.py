@@ -2,9 +2,10 @@ import os
 from collections import Counter
 
 import chromadb
-from qdrant_client import QdrantClient
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core.vector_stores.utils import metadata_dict_to_node
+
+from ..vector_store.config import build_qdrant_client
 
 
 
@@ -13,12 +14,8 @@ def _get_collection():
     return client.get_collection(name=os.getenv("COLLECTION_NAME"))
 
 def _get_collection_from_qdrant():
-    qclient = QdrantClient(
-        url=os.getenv("QDRANT_URL", "http://127.0.0.1:6333"),
-        
-    )
     vector_store = QdrantVectorStore(
-        client=qclient, collection_name=os.getenv("COLLECTION_NAME")
+        client=build_qdrant_client(), collection_name=os.getenv("COLLECTION_NAME")
     )
     nodes = []
     offset = None

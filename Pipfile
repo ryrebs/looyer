@@ -9,7 +9,7 @@ pydantic = ">=2"                         # LLMTextCompletionProgram validates st
 # --- Layer 1: document loading ---
 llama-index-core = "*"                   # chunking, pipeline, retrieval, structured output
 docling = "*"                            # HTML → Markdown (Constitution)
-pymupdf4llm = "*"                        # PDF → Markdown (Civil Code)
+pymupdf4llm = "==1.28.2"                        # PDF → Markdown (Civil Code)
 # --- Layer 3: embedding + vector index ---
 llama-index-embeddings-ollama = "*"      # bge-m3 via Ollama native API
 chromadb = "*"                           # embedded vector store, no server
@@ -20,9 +20,11 @@ fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 flask = "*"
 llama-index-postprocessor-flag-embedding-reranker = "*"
+flagembedding = "==1.4.2"                # required by the reranker, not pulled in by it
 llama-index-embeddings-huggingface = "*"
 optimum = {extras = ["onnxruntime"], version = "*"}
 optimum-intel = {extras = ["openvino"], version = "*"}
+llama-index-llms-openai-like = "*"      # LLMs via any OpenAI-compatible server (llama-server, vLLM, hosted)
 llama-index-llms-llama-cpp = "*"
 # --- Need  libopenblas-dev on debian
 # --- CMAKE_ARGS="-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS" pipenv run pip install llama-cpp-python --force-reinstall --no-cache-dir
@@ -30,6 +32,7 @@ llama-cpp-python = "*"
 huggingface-hub = "*"
 llama-index-retrievers-bm25 = "*"
 llama-index-vector-stores-qdrant = "*"
+qdrant-client = "==1.18.0"                # must match the Qdrant server (1.18.x), see README
 graphifyy = "*"
 
 [dev-packages]

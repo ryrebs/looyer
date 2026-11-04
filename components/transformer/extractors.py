@@ -1,6 +1,5 @@
 """Custom extractors and text transformation helpers."""
 
-import json
 import re
 from typing import Any, Sequence
 
@@ -13,63 +12,51 @@ from llama_index.core.schema import BaseNode
 _HEADING_LINE = re.compile(r"^(#{1,6})\s+(.*)$")
 _EMPHASIS = re.compile(r"\*{1,2}|_{1,2}")
 _ARTICLE_LINE = re.compile(r"^\s*-?\s*\*\*\s*(Article\s+\d+\.?)\s*\*\*\s*(.*)")
+# A bold article marker after other text on the same line (not a "- **Article" list item)
+_MIDLINE_ARTICLE = re.compile(r"(?<=[^\s-])[ \t]+(\*\*\s*Article\s+\d+\.?\s*\*\*)")
+# "Article" and its number split across lines: "**Article**\n\n**368.**" or "... Belongs Article\n\n**419.**"
+_SPLIT_ARTICLE = re.compile(r"[ \t]*(?:\*\*)?Article(?:\*\*)?[ \t]*\n+[ \t]*\*\*(\d+)\.\*\*")
+# Article inside another bold heading: "**CHAPTER 2 Quasi-delicts Article 2176.**"
+_HEADING_WITH_ARTICLE = re.compile(r"\*\*([^*]+?)\s+Article\s+(\d+)\.\*\*")
+# Plain uppercase marker: "ARTICLE 1642." (prose cross-references are lowercase "article")
+_PLAIN_ARTICLE = re.compile(r"(?<![\w*])ARTICLE\s+(\d+)\.(?!\*)")
+# Bare bold number at line start, where OCR lost the word "Article": "**1156.** An obligation ..."
+_BARE_ARTICLE_NUMBER = re.compile(r"(?m)^[ \t]*\*\*(\d+)\.\*\*")
 
 _CONST_ARTICLE_RE = re.compile(r"^(ARTICLE\s+[IVXLCDM]+)\s+(.*)", re.IGNORECASE)
 _CONST_SECTION_RE = re.compile(r"^(Section\s+\d+\.?)\s*$", re.IGNORECASE)
 _CONST_ALLCAPS_RE = re.compile(r"^[A-Z][A-Z\s,\-]+$")
 
-_JSON_RE = re.compile(r"\{.*\}", re.DOTALL)
-
-# --- LLM extraction prompt ---
-
-_LEGAL_META_PROMPT = """\
-Extract legal document metadata from the text below.
-Return ONLY a valid JSON object, no other text.
-
-Fields (use null for missing fields, true/false for boolean fields):
-- book: book or part name (e.g. "Book I: Persons")
-- title: title within book (e.g. "Title I: Civil Personality")
-- chapter: chapter name (e.g. "Chapter 1 Effect and Application of Laws")
-- article_number: article number (e.g. "Article 1", "Art. 40")
-- section_header: section heading if present
-- proviso_flag: true if text contains a proviso ("provided that", "provided however")
-- is_amended: true if text indicates it has been amended
-- is_repealed: true if text indicates it has been repealed
-
-Text:
-{context}
-
-JSON:"""
+_HEADING_ARTICLE_RE = re.compile(r"^ARTICLE\s+([IVXLCDM]+|\d+)\b", re.IGNORECASE)
+_HEADING_SECTION_RE = re.compile(r"^SECTION\s+(\d+)\b", re.IGNORECASE)
 
 
-# --- Custom extractor ---
 
-class LegalMetadataExtractor(BaseExtractor):
-    llm: Any = None
-    max_context_length: int = 600
+# --- Custom extractors ---
+
+class LegalHeadingExtractor(BaseExtractor):
+    """Set `article` and `section` from the Markdown headings, without an LLM.
+
+    Must run after MarkdownNodeParser and before any splitter: header_path only
+    holds the parent headings, so the node's own heading ("### Section 14.") is
+    read from its first line, which a splitter would cut off. Splitters copy
+    metadata to every chunk, so each chunk keeps its citation.
+    """
 
     async def aextract(self, nodes: Sequence[BaseNode]) -> list[dict[str, Any]]:
         results = []
         for node in nodes:
-            if self.llm is None:
-                results.append({})
-                continue
-            headers = " > ".join(
-                v for k, v in node.metadata.items() if k.startswith("Header")
-            )
-            context = node.get_content()[:self.max_context_length]
-            if headers:
-                context = f"Headers: {headers}\n\n{context}"
-            prompt = _LEGAL_META_PROMPT.format(context=context)
-            try:
-                raw = self.llm.complete(
-                    prompt, stop=["\n\n\n", "\nText:", "\nFields:"]
-                ).text.strip()
-                m = _JSON_RE.search(raw)
-                meta = json.loads(m.group(0)) if m else {}
-                meta = {k: v for k, v in meta.items() if v is not None}
-            except Exception:
-                meta = {}
+            headings = [h for h in node.metadata.get("header_path", "").split("/") if h]
+            first_line = node.get_content().split("\n", 1)[0]
+            if m := _HEADING_LINE.match(first_line):
+                headings.append(m.group(2).strip())
+
+            meta = {}
+            for heading in headings:
+                if m := _HEADING_ARTICLE_RE.match(heading):
+                    meta["article"] = f"Article {m.group(1).upper()}"
+                elif m := _HEADING_SECTION_RE.match(heading):
+                    meta["section"] = f"Section {m.group(1)}"
             results.append(meta)
         return results
 
@@ -97,6 +84,14 @@ def _clean_heading_markup(markdown: str) -> str:
 
 
 def _promote_articles(markdown: str) -> str:
+    # The PDF writes article markers in several layouts. Normalize each to
+    # "**Article N.**" at the start of a line, or the article merges into the previous one.
+    markdown = _SPLIT_ARTICLE.sub(r"\n**Article \1.**", markdown)
+    markdown = _HEADING_WITH_ARTICLE.sub(r"**\1**\n**Article \2.**", markdown)
+    markdown = _PLAIN_ARTICLE.sub(r"\n**Article \1.**", markdown)
+    markdown = _BARE_ARTICLE_NUMBER.sub(r"**Article \1.**", markdown)
+    # Some lines hold several articles ("... (n) **Article 85.** A marriage ...")
+    markdown = _MIDLINE_ARTICLE.sub(r"\n\1", markdown)
     out = []
     for line in markdown.splitlines():
         m = _ARTICLE_LINE.match(line)

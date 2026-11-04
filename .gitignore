@@ -1,6 +1,7 @@
 .cache/
 .pytest_*
 .venv
+*pyc
 
 ## We don't want to include assets/, the application should be source agnostic
 assets
