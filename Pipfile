@@ -37,6 +37,9 @@ graphifyy = "*"
 
 [dev-packages]
 pytest = "*"
+# pre-commit installs isort, black and bandit in its own envs; pylint runs in this env (local hook)
+pre-commit = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.11"
