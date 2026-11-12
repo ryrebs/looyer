@@ -6,21 +6,18 @@ The index is the pivot: ingestion writes it, query reads it.
 
 import os
 
+## TO BE DEPRECATED (Chroma, replaced by Qdrant): chromadb is only used by build_index() and load_index()
 import chromadb
+from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.core.schema import BaseNode, MetadataMode
-
 from llama_index.vector_stores.qdrant import QdrantVectorStore
-from llama_index.core import StorageContext
-from llama_index.core import VectorStoreIndex
 
 from ..vector_store.config import build_qdrant_client
 
 
 def build_durable_storage_context(collection_name: str, client=None):
     ## Qdrant scalable and production ready index storage; local Docker or Cloud from .env
-    vector_store = QdrantVectorStore(
-        client=client or build_qdrant_client(), collection_name=collection_name
-    )
+    vector_store = QdrantVectorStore(client=client or build_qdrant_client(), collection_name=collection_name)
 
     return StorageContext.from_defaults(
         vector_store=vector_store,
@@ -48,6 +45,7 @@ def build_index_from_durable_storage(
     return index
 
 
+## TO BE DEPRECATED (Chroma, replaced by Qdrant): unused, Qdrant indexing is build_index_from_durable_storage()
 def build_index(nodes: list[BaseNode], embed_model=None) -> chromadb.Collection:
     """Embed nodes and persist them into a Chroma collection.
 
@@ -84,6 +82,7 @@ def build_index(nodes: list[BaseNode], embed_model=None) -> chromadb.Collection:
     return collection
 
 
+## TO BE DEPRECATED (Chroma, replaced by Qdrant): unused
 def load_index() -> chromadb.Collection:
     """Load an existing persisted Chroma collection (query time)."""
     client = chromadb.PersistentClient(path=os.getenv("INDEX_DIR"))

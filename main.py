@@ -1,39 +1,35 @@
-import sys
 import os
+import sys
 
-from llama_index.core import Settings
-
-Settings.llm = None
-
-from components import (
-    load_document,
-    markdown_chunk_text,
-    transform_mk_cv_code,
-    transform_html_const,
-    _clean_heading_markup,
-    _promote_articles,
-    build_index,
-    build_durable_storage_context,
-    build_index_from_durable_storage,
-    retrieve,
-    rerank,
-    rag_response_syn,
-    irac_qa_template,
-    irac_refine_template,
-    build_llm,
-    check_llm_server,
-    build_embed_model,
-    embedding_dimension,
-    build_qdrant_client,
-    check_qdrant,
-    evaluate
-)
-
-
+## TO BE DEPRECATED (Chroma, replaced by Qdrant): only used by _collection_exists() below
 import chromadb
 from pydantic import BaseModel, Field
-from llama_index.core.schema import NodeWithScore, TextNode
 
+from components import (
+    _clean_heading_markup,
+    _promote_articles,
+    build_durable_storage_context,
+    build_embed_model,
+    build_index_from_durable_storage,
+    build_llm,
+    build_qdrant_client,
+    check_llm_server,
+    check_qdrant,
+    clear_bm25_cache,
+    embedding_dimension,
+    irac_qa_template,
+    irac_refine_template,
+    load_document,
+    markdown_chunk_text,
+    rag_response_syn,
+    rerank,
+    rerank_score_threshold,
+    retrieve,
+    simpostprocessor,
+    transform_html_const,
+    transform_mk_cv_code,
+)
+from components.evaluator.evaluate import evaluate
 
 ## Embedding model: in-app or Ollama, from .env (EMBED_API_BASE). See components/embedding/config.py.
 _embed_model = build_embed_model()
@@ -42,6 +38,7 @@ _embed_model = build_embed_model()
 ## LLMs run on OpenAI-compatible servers; build_llm(role) only creates an HTTP client.
 ## Request settings: components/llm/profiles.json. Servers: .env and README "LLM servers".
 COLLECTION_NAME = os.getenv("COLLECTION_NAME")
+## TO BE DEPRECATED (Chroma, replaced by Qdrant): Chroma's folder; Qdrant doesn't use it
 INDEX_DIR = os.getenv("INDEX_DIR")
 ## Qdrant: local Docker or Cloud, from .env (QDRANT_URL, QDRANT_API_KEY)
 _qdrant = build_qdrant_client()
@@ -63,9 +60,7 @@ def load_data(path: str) -> ParseData:
 def load_chunked_embed(path: str):
     mk = load_data(path)
     if ".pdf" in mk.path:
-        texts = transform_mk_cv_code(
-            mk.content, [_clean_heading_markup, _promote_articles]
-        )
+        texts = transform_mk_cv_code(mk.content, [_clean_heading_markup, _promote_articles])
     else:
         texts = transform_html_const(mk.content)
 
@@ -75,11 +70,15 @@ def load_chunked_embed(path: str):
         embed_model=_embed_model,
     )
 
+    ## TO BE DEPRECATED (Chroma, replaced by Qdrant)
     ## ChromaDB
     # build_index(nodes, embed_model=_embed_model)
 
     ## Qdrant
     storage_context = build_durable_storage_context(COLLECTION_NAME, client=_qdrant)
+    ## The data is about to change: delete BM25's local copy of the chunks, so the next search
+    ## rebuilds it from Qdrant. Before writing, so a crash halfway also leaves no stale copy.
+    clear_bm25_cache(storage_context.vector_store)
     ## The file path is the same on every chunk of a document: noise for search, so it is
     ## kept out of the embedded text (the answer LLM still sees it for citing)
     build_index_from_durable_storage(
@@ -90,6 +89,7 @@ def load_chunked_embed(path: str):
     )
 
 
+## TO BE DEPRECATED (Chroma, replaced by Qdrant): unused, see _qdrant_collection_exists()
 def _collection_exists() -> bool:
     try:
         client = chromadb.PersistentClient(path=INDEX_DIR)
@@ -116,11 +116,23 @@ def _check_embed_model() -> None:
 
 
 def run_rag_pipeline(query: str) -> str:
+    ## Built here, not at import: creating it already contacts Qdrant (checks the collection),
+    ## so it must come after check_qdrant(). Reuses this module's Qdrant client.
+    storage_context = build_durable_storage_context(COLLECTION_NAME, client=_qdrant)
+
     ## HyDE only needs a short hypothetical answer, so it has its own role (a small
     ## instruct model) instead of the answer model.
     nodes = retrieve(
-        query, k=20, run_rerank=True, embed_model=_embed_model, hyde_llm=build_llm("hyde")
+        query,
+        storage_context,
+        k=20,
+        embed_model=_embed_model,
+        hyde_llm=build_llm("hyde"),
     )
+    ## Of the 20 fused chunks, the reranker keeps the 5 the answer LLM sees
+    nodes = rerank(nodes, query)
+    ## Drop chunks the reranker scored below RERANK_SCORE_THRESHOLD
+    nodes = simpostprocessor(rerank_score_threshold(), nodes)
     if not nodes:
         print("No relevant documents found for your query.")
         sys.exit(1)
@@ -152,7 +164,7 @@ if __name__ == "__main__":
         print(f"Building index for {args[1]}...")
         load_chunked_embed(args[1])
         print("Done.")
-    if args[0] == "evaluate":
+    elif args[0] == "evaluate":
         evaluate()
         print("Done.")
     else:

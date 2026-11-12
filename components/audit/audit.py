@@ -1,22 +1,22 @@
 import os
 from collections import Counter
 
+## TO BE DEPRECATED (Chroma, replaced by Qdrant): chromadb is only used by _get_collection()
 import chromadb
-from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core.vector_stores.utils import metadata_dict_to_node
+from llama_index.vector_stores.qdrant import QdrantVectorStore
 
 from ..vector_store.config import build_qdrant_client
 
 
-
+## TO BE DEPRECATED (Chroma, replaced by Qdrant): _get_collection_from_qdrant() is the live one (check_index.py uses it)
 def _get_collection():
     client = chromadb.PersistentClient(path=os.getenv("INDEX_DIR"))
     return client.get_collection(name=os.getenv("COLLECTION_NAME"))
 
+
 def _get_collection_from_qdrant():
-    vector_store = QdrantVectorStore(
-        client=build_qdrant_client(), collection_name=os.getenv("COLLECTION_NAME")
-    )
+    vector_store = QdrantVectorStore(client=build_qdrant_client(), collection_name=os.getenv("COLLECTION_NAME"))
     nodes = []
     offset = None
     while True:
@@ -30,7 +30,6 @@ def _get_collection_from_qdrant():
         if offset is None:
             break
     return nodes
-
 
 
 # ─── GROUPING KEY ─────────────────────────────────────────────────────────────
@@ -141,7 +140,6 @@ if __name__ == "__main__":
     for key, count in sorted(fragmented.items(), key=lambda x: -x[1])[:20]:
         print(f"  {count}x  {key}")
 
-
     ## Sample output:
     # Total atoms  : 3766
     # Fragmented   : 335
@@ -169,11 +167,14 @@ if __name__ == "__main__":
     # 9x  (('header_path', '/CHAPTER 2 Pledge/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf'))
     # 9x  (('header_path', '/CHAPTER 1 General Provisions/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf'))
 
-
     ## To inspect a specific unit, copy a key from the output above and pass it:
     inspect_section(
         (
-            ('header_path', '/CHAPTER 1 General Provisions/'), ('is_amended', False), ('is_repealed', False), ('proviso_flag', False), ('source', './assets/civil_code.pdf')
+            ("header_path", "/CHAPTER 1 General Provisions/"),
+            ("is_amended", False),
+            ("is_repealed", False),
+            ("proviso_flag", False),
+            ("source", "./assets/civil_code.pdf"),
         ),
         show_fragments=30,
     )

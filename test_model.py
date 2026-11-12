@@ -1,15 +1,14 @@
 import os
 import sys
 import time
-from typing import Any, Optional
 
-from pydantic import BaseModel, Field
-from llama_index.llms.llama_cpp import LlamaCPP
-from llama_index.core.program import LLMTextCompletionProgram
-from llama_index.core.schema import TextNode
-from llama_index.core.extractors import QuestionsAnsweredExtractor
 from llama_index.core.callbacks import CallbackManager, CBEventType
 from llama_index.core.callbacks.base_handler import BaseCallbackHandler
+from llama_index.core.extractors import QuestionsAnsweredExtractor
+from llama_index.core.program import LLMTextCompletionProgram
+from llama_index.core.schema import TextNode
+from llama_index.llms.llama_cpp import LlamaCPP
+from pydantic import BaseModel, Field
 
 
 class ChunkProgressHandler(BaseCallbackHandler):
@@ -29,8 +28,11 @@ class ChunkProgressHandler(BaseCallbackHandler):
         if event_type == CBEventType.LLM:
             print(f"[chunk {self._chunk}] done in {time.time() - self._t:.1f}s", flush=True)
 
-    def start_trace(self, trace_id=None): pass
-    def end_trace(self, trace_id=None, trace_map=None): pass
+    def start_trace(self, trace_id=None):
+        pass
+
+    def end_trace(self, trace_id=None, trace_map=None):
+        pass
 
 
 class ReasoningResult(BaseModel):
@@ -86,9 +88,7 @@ if __name__ == "__main__":
             output_cls=ReasoningResult,
             llm=_llm,
             prompt_template_str=(
-                "EVIDENCE:\n{evidence_block}\n\n"
-                "QUESTION: {question}\n"
-                "Answer based only on the evidence above."
+                "EVIDENCE:\n{evidence_block}\n\n" "QUESTION: {question}\n" "Answer based only on the evidence above."
             ),
             verbose=False,
         )

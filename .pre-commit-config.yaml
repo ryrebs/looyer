@@ -45,11 +45,7 @@ repos:
         entry: pipenv run pylint
         language: system
         types: [python]
-        args:
-          [
-            --max-line-length=120,
-            "--disable=missing-module-docstring,missing-class-docstring,missing-function-docstring,too-few-public-methods",
-          ]
+        # settings: [tool.pylint.*] in pyproject.toml
 
   # 4. General file hygiene
   - repo: https://github.com/pre-commit/pre-commit-hooks

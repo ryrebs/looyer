@@ -1,0 +1,336 @@
+{
+  "started_at": "2026-11-10T08:13:58+00:00",
+  "fingerprint": "1d10733917c0fdeb7477f5fd6dd7c052f1257a869a8da460738a04aab48e8ef3",
+  "answer_key_sha256": "ae37a8f2c582643cbaf2807910ae04ea7f27fe6edb02ccd5f8a2ad1c3f58a581",
+  "code": {
+    "commit": "aaf131e",
+    "uncommitted_sha256": "69477127222126669999746736b7253e5858eafb12b5560ba7596ba2f13d78ce"
+  },
+  "settings": {
+    "fused_top_k": 20,
+    "rerank_top_n": 5,
+    "hyde_model": "gemma4:latest",
+    "hyde_settings": {
+      "temperature": 0.2,
+      "top_p": 0.8,
+      "max_tokens": 256,
+      "context_window": 4096,
+      "timeout": 1800.0,
+      "reasoning_effort": "none"
+    },
+    "embed_model": "bge-m3",
+    "reranker_model": "BAAI/bge-reranker-base@2cfc18c",
+    "rerank_score_threshold": -5.0,
+    "answer_model": "gemma4:31b",
+    "answer_settings": {
+      "temperature": 0.8,
+      "top_p": 0.95,
+      "max_tokens": 5120,
+      "context_window": 16384,
+      "timeout": 1800.0,
+      "reasoning_effort": null
+    },
+    "judge_model": "nemotron-3.5-super:120b",
+    "judge_settings": {
+      "temperature": 0.0,
+      "top_p": null,
+      "max_tokens": 8,
+      "context_window": 16384,
+      "timeout": 1800.0,
+      "reasoning_effort": "none"
+    },
+    "judge_prompt_sha256": "79e9b808d635f13ab789e2f33de5dd3a3dc1078ab195fea99974d6392c5abf8b",
+    "prompt_sha256": "01e93cca6b045337c4fa87aefb5c49dbe194b803c379a9d9261a94c5b550647e",
+    "collection": "looyer_cloud",
+    "index_points": 5177
+  },
+  "summary": {
+    "direct_lookup": {
+      "questions": 1,
+      "refused": 0.0,
+      "faithful": null,
+      "correct": null,
+      "hit_rate_fused@20": 1.0,
+      "hit_rate_rerank@5": 1.0,
+      "recall_fused@20": 1.0,
+      "recall_rerank@5": 1.0,
+      "mrr_fused@20": 0.5,
+      "mrr_rerank@5": 1.0,
+      "judge_errors": 2
+    },
+    "inference": {
+      "questions": 0,
+      "judge_errors": 0
+    },
+    "negative": {
+      "questions": 0,
+      "judge_errors": 0
+    },
+    "overall": {
+      "questions": 1,
+      "refused": 0.0,
+      "faithful": null,
+      "correct": null,
+      "hit_rate_fused@20": 1.0,
+      "hit_rate_rerank@5": 1.0,
+      "recall_fused@20": 1.0,
+      "recall_rerank@5": 1.0,
+      "mrr_fused@20": 0.5,
+      "mrr_rerank@5": 1.0,
+      "judge_errors": 2
+    }
+  },
+  "results": {
+    "direct_lookup": [
+      {
+        "gds_id": "dl-01",
+        "question": "What rights does an accused person have during custodial investigation?",
+        "reference_ans": "A person under investigation for the commission of an offense has the right to be informed of his right to remain silent and to have competent and independent counsel, preferably of his own choice; if he cannot afford counsel, he must be provided with one. These rights cannot be waived except in writing and in the presence of counsel. No torture, force, violence, threat, intimidation, or other means that vitiate free will may be used against him, and secret detention places, solitary, incommunicado, or similar forms of detention are prohibited. Any confession or admission obtained in violation of these rights is inadmissible in evidence against him. (Article III, Section 12, 1987 Constitution)",
+        "expected_metadata": [
+          {
+            "source": "1987_const.html",
+            "article": "Article III",
+            "section": "Section 12"
+          }
+        ],
+        "fused_metadata": [
+          {
+            "rank": 1,
+            "score": 0.03306010928961749,
+            "source": "1987_const.html",
+            "article": "Article III",
+            "section": "Section 14",
+            "matched": false
+          },
+          {
+            "rank": 2,
+            "score": 0.03115942028985507,
+            "source": "1987_const.html",
+            "article": "Article III",
+            "section": "Section 12",
+            "matched": true
+          },
+          {
+            "rank": 3,
+            "score": 0.03076923076923077,
+            "source": "1987_const.html",
+            "article": "Article XIII",
+            "section": "Section 18",
+            "matched": false
+          },
+          {
+            "rank": 4,
+            "score": 0.03057889822595705,
+            "source": "civil_code.pdf",
+            "article": "Article 32",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 5,
+            "score": 0.01639344262295082,
+            "source": "civil_code.pdf",
+            "article": "Article 971",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 6,
+            "score": 0.016129032258064516,
+            "source": "1987_const.html",
+            "article": "Article III",
+            "section": "Section 2",
+            "matched": false
+          },
+          {
+            "rank": 7,
+            "score": 0.016129032258064516,
+            "source": "civil_code.pdf",
+            "article": "Article 1032",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 8,
+            "score": 0.015873015873015872,
+            "source": "civil_code.pdf",
+            "article": "Article 456",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 9,
+            "score": 0.015625,
+            "source": "1987_const.html",
+            "article": "Article III",
+            "section": "Section 13",
+            "matched": false
+          },
+          {
+            "rank": 10,
+            "score": 0.015625,
+            "source": "civil_code.pdf",
+            "article": "Article 1512",
+            "section": "Section 2",
+            "matched": false
+          },
+          {
+            "rank": 11,
+            "score": 0.015151515151515152,
+            "source": "civil_code.pdf",
+            "article": "Article 539",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 12,
+            "score": 0.015151515151515152,
+            "source": "civil_code.pdf",
+            "article": "Article 1109",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 13,
+            "score": 0.014925373134328358,
+            "source": "1987_const.html",
+            "article": "Article VI",
+            "section": "Section 21",
+            "matched": false
+          },
+          {
+            "rank": 14,
+            "score": 0.014925373134328358,
+            "source": "civil_code.pdf",
+            "article": "Article 1402",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 15,
+            "score": 0.014705882352941176,
+            "source": "civil_code.pdf",
+            "article": "Article 101",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 16,
+            "score": 0.014492753623188406,
+            "source": "civil_code.pdf",
+            "article": "Article 1437",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 17,
+            "score": 0.014285714285714285,
+            "source": "civil_code.pdf",
+            "article": "Article 1547",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 18,
+            "score": 0.014285714285714285,
+            "source": "civil_code.pdf",
+            "article": "Article 1681",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 19,
+            "score": 0.014084507042253521,
+            "source": "1987_const.html",
+            "article": "Article III",
+            "section": "Section 18",
+            "matched": false
+          },
+          {
+            "rank": 20,
+            "score": 0.014084507042253521,
+            "source": "civil_code.pdf",
+            "article": "Article 1188",
+            "section": null,
+            "matched": false
+          }
+        ],
+        "rerank_metadata": [
+          {
+            "rank": 1,
+            "score": 0.8234397172927856,
+            "source": "1987_const.html",
+            "article": "Article III",
+            "section": "Section 12",
+            "matched": true
+          },
+          {
+            "rank": 2,
+            "score": -2.564702033996582,
+            "source": "1987_const.html",
+            "article": "Article III",
+            "section": "Section 14",
+            "matched": false
+          },
+          {
+            "rank": 3,
+            "score": -2.966146469116211,
+            "source": "civil_code.pdf",
+            "article": "Article 32",
+            "section": null,
+            "matched": false
+          },
+          {
+            "rank": 4,
+            "score": -4.022790431976318,
+            "source": "1987_const.html",
+            "article": "Article III",
+            "section": "Section 2",
+            "matched": false
+          },
+          {
+            "rank": 5,
+            "score": -4.732517719268799,
+            "source": "civil_code.pdf",
+            "article": "Article 1032",
+            "section": null,
+            "matched": false
+          }
+        ],
+        "best_rerank_score": 0.8234397172927856,
+        "kept_after_threshold": 5,
+        "answer": "**ISSUE**: What are the specific rights of a person under investigation for the commission of an offense (custodial investigation)?\n\n**RULE**: Article III, Section 12 of the Constitution provides:\n\"1. Any person under investigation for the commission of an offense shall have the right to be informed of his right to remain silent and to have competent and independent counsel preferably of his own choice. If the person cannot afford the services of counsel, he must be provided with one. These rights cannot be waived except in writing and in the presence of counsel. 2. No torture, force, violence, threat, intimidation, or any other means which vitiate the free will shall be used against him. Secret detention places, solitary, incommunicado, or other similar forms of detention are prohibited. 3. Any confession or admission obtained in violation of this or Section 17 hereof shall be inadmissible in evidence against him. 4. The law shall provide for penal and civil sanctions for violations of this Section as well as compensation to the rehabilitation of victims of torture or similar practices, and their families.\"\n\n**APPLICATION**: \n1. **Right to Information and Counsel**: A person under investigation must be informed of their right to remain silent and their right to \"competent and independent counsel preferably of his own choice.\" If the individual is indigent (\"cannot afford the services of counsel\"), the state \"must\" provide one.\n2. **Waiver Requirements**: The rights to silence and counsel are not easily relinquished; they \"cannot be waived except in writing and in the presence of counsel.\"\n3. **Prohibitions on Treatment and Detention**: The use of \"torture, force, violence, threat, intimidation, or any other means which vitiate the free will\" is forbidden. Furthermore, \"Secret detention places, solitary, incommunicado, or other similar forms of detention are prohibited.\"\n4. **Consequence of Violation**: Any \"confession or admission\" acquired by violating these rules (or Section 17) is \"inadmissible in evidence against him.\"\n5. **Remedies**: The provision mandates that the law provide \"penal and civil sanctions\" for violations, as well as \"compensation to the rehabilitation of victims of torture or similar practices, and their families.\"\n\n**CONCLUSION**: A person under investigation for an offense has the right to be informed of their right to remain silent and to have competent and independent counsel (provided by the state if they cannot afford one), rights which can only be waived in writing and in the presence of counsel. They are protected against the use of torture, force, violence, threat, intimidation, or any means that vitiate free will, and against secret, solitary, or incommunicado detention. [INFERENCE] Any evidence obtained through the violation of these rights is legally unusable against the accused in court. [INFERENCE] Violators of these rights are subject to penal and civil sanctions, and victims are entitled to compensation for rehabilitation.",
+        "answer_error": null,
+        "refused_by": null,
+        "refused": 0.0,
+        "contains_token": false,
+        "faithful": null,
+        "correct": null,
+        "judge_errors": {
+          "faithful": "NotFoundError: Error code: 404 - {'error': {'message': 'model \"nemotron-3.5-super:120b\" not found. Try glm-5.3-flash:cloud.', 'type': 'not_found_error', 'param': None, 'code': None}}",
+          "correct": "NotFoundError: Error code: 404 - {'error': {'message': 'model \"nemotron-3.5-super:120b\" not found. Try glm-5.3-flash:cloud.', 'type': 'not_found_error', 'param': None, 'code': None}}"
+        },
+        "seconds": {
+          "retrieve": 4.48,
+          "rerank": 10.89,
+          "answer": 3.88,
+          "judge": 0.92
+        },
+        "found_fused": [
+          true
+        ],
+        "found_rerank": [
+          true
+        ],
+        "hit_rate_fused@20": 1.0,
+        "hit_rate_rerank@5": 1.0,
+        "recall_fused@20": 1.0,
+        "recall_rerank@5": 1.0,
+        "rr_fused@20": 0.5,
+        "rr_rerank@5": 1.0
+      }
+    ],
+    "inference": [],
+    "negative": []
+  }
+}

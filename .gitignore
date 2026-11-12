@@ -10,6 +10,8 @@ data/
 
 tmp/
 *.lock
+## except the app's dependency lock: exact versions + hashes for every package (commit it)
+!Pipfile.lock
 ## graphify output (local knowledge graph)
 graphify-out/
 

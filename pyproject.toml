@@ -1,0 +1,25 @@
+# Tool settings only: this is an application, not a package to install (dependencies stay in the Pipfile).
+
+[tool.pytest.ini_options]
+# Where tests live: tests/ for app-wide tests, components/<name>/tests/ for a component's own tests.
+# Anything else (e.g. the test_model.py script in the repo root) is not collected.
+testpaths = ["tests", "components"]
+# Import `components` from the repo root, whether started as `pytest` or `python -m pytest`.
+pythonpath = ["."]
+# importlib: test folders need no __init__.py, and two test files may share a name in different folders.
+# -ra: list every failed, skipped or xfailed test at the end. strict: a typo in a marker or setting is an error.
+# --tb=line: one line per failure (the error and where it was raised). When that's not enough,
+# rerun the failing test with more detail: --tb=short (one line per frame) or --tb=long (full source).
+addopts = ["--import-mode=importlib", "-ra", "--strict-markers", "--strict-config", "--tb=line"]
+# pytest-asyncio (installed by a dependency) warns at every run until this is set. Its future default.
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.pylint.main]
+# Resolve `components...` imports from the repo root (pylint otherwise guesses from the __init__.py files).
+source-roots = ["."]
+
+[tool.pylint.format]
+max-line-length = 120  # same as black and isort
+
+[tool.pylint."messages control"]
+disable = ["missing-module-docstring", "missing-class-docstring", "missing-function-docstring", "too-few-public-methods"]
