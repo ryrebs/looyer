@@ -9,6 +9,8 @@ from datetime import datetime, timezone
 from json.decoder import JSONDecodeError
 from pathlib import Path
 
+import mlflow
+
 from components import (
     build_durable_storage_context,
     build_embed_model,
@@ -32,6 +34,7 @@ from components.evaluator.judge import (
 )
 from components.llm.config import load_role
 from components.synthesizer.templates import INSUFFICIENT_CONTEXT
+from components.tracing.config import EXPERIMENT_EVAL, setup_tracing
 
 _logger = logging.getLogger(__name__)
 
@@ -88,7 +91,7 @@ def sha256_of(data) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-def answer_key_sha256(verified: dict) -> str:
+def hash_answer_key(verified: dict) -> str:
     """Fingerprint of the answer key this run is graded against.
 
     Only the verified entries' grading fields, so formatting or review_note edits don't change it.
@@ -144,7 +147,7 @@ def retrieval_settings(embed_model) -> dict:
     }
 
 
-def run_fingerprint(answer_key: str, code: dict, settings: dict) -> str:
+def create_run_fingerprint(answer_key: str, code: dict, settings: dict) -> str:
     """Same answer key + same code + same settings = same results, so no need to run again."""
     return sha256_of({"answer_key_sha256": answer_key, "code": code, "settings": settings})
 
@@ -320,10 +323,10 @@ def evaluate(force: bool = False):
         datast = get_gds(golden_dataset)
 
         ## Skip the run when nothing that affects the results changed since a saved run
-        answer_key = answer_key_sha256(datast)
+        answer_key = hash_answer_key(datast)
         code = code_version()
         settings = retrieval_settings(embed_model)
-        fingerprint = run_fingerprint(answer_key, code, settings)
+        fingerprint = create_run_fingerprint(answer_key, code, settings)
         previous = None if force else find_run(fingerprint)
         if previous:
             print(f"Nothing changed since {previous} (same answer key, code and settings): not running again.")
@@ -339,6 +342,7 @@ def evaluate(force: bool = False):
         hyde_llm = build_llm("hyde")
         answer_llm = build_llm("answer")
         judge_llm = build_llm("judge")
+        setup_tracing(EXPERIMENT_EVAL)
 
         results = {}
         for group, v in datast.items():
@@ -347,28 +351,40 @@ def evaluate(force: bool = False):
                 q = d["question"]
                 seconds = {}  # per stage
 
-                ## Get metadata after node processing
-                ## to avoid overwriting scores
-                t0 = time.perf_counter()
-                nodes_fused = retrieve(q, storage_context, k=FUSED_TOP_K, embed_model=embed_model, hyde_llm=hyde_llm)
-                seconds["retrieve"] = round(time.perf_counter() - t0, 2)  # HyDE + dense + BM25 + fusion
-                f_metadata = mark_matched(d["expected_metadata"], get_metadata(nodes_fused))
+                ## One trace per question. Spans get only plain values: an LLM client
+                ## passed as a span input would be saved with its api_key.
+                with mlflow.start_span(name=d["id"]) as question_span:
+                    question_span.set_inputs({"question": q, "group": group})
 
-                t0 = time.perf_counter()
-                nodes_reranked = rerank(nodes_fused, q, top_n=RANK_TOP_N)
-                seconds["rerank"] = round(time.perf_counter() - t0, 2)
-                ## As main.py. Metrics use nodes_reranked; the LLM gets nodes_kept.
-                nodes_kept = simpostprocessor(settings["rerank_score_threshold"], nodes_reranked)
+                    ## Get metadata after node processing
+                    ## to avoid overwriting scores
+                    t0 = time.perf_counter()
+                    nodes_fused = retrieve(
+                        q, storage_context, k=FUSED_TOP_K, embed_model=embed_model, hyde_llm=hyde_llm
+                    )
+                    seconds["retrieve"] = round(time.perf_counter() - t0, 2)  # HyDE + dense + BM25 + fusion
+                    f_metadata = mark_matched(d["expected_metadata"], get_metadata(nodes_fused))
 
-                t0 = time.perf_counter()
-                answer, answer_error, refused_by = generate_answer(nodes_kept, q, answer_llm, d["id"])
-                seconds["answer"] = round(time.perf_counter() - t0, 2)
+                    t0 = time.perf_counter()
+                    nodes_reranked = rerank(nodes_fused, q, top_n=RANK_TOP_N)
+                    seconds["rerank"] = round(time.perf_counter() - t0, 2)
+                    ## As main.py. Metrics use nodes_reranked; the LLM gets nodes_kept.
+                    nodes_kept = simpostprocessor(settings["rerank_score_threshold"], nodes_reranked)
 
-                t0 = time.perf_counter()
-                faithful, correct, judge_errors = judge_answer(
-                    judge_llm, group, d, nodes_kept, answer, answer_error, refused_by
-                )
-                seconds["judge"] = round(time.perf_counter() - t0, 2)
+                    t0 = time.perf_counter()
+                    answer, answer_error, refused_by = generate_answer(nodes_kept, q, answer_llm, d["id"])
+                    seconds["answer"] = round(time.perf_counter() - t0, 2)
+
+                    t0 = time.perf_counter()
+                    with mlflow.start_span(name="judge") as span:
+                        span.set_inputs({"group": group, "refused_by": refused_by})
+                        faithful, correct, judge_errors = judge_answer(
+                            judge_llm, group, d, nodes_kept, answer, answer_error, refused_by
+                        )
+                        span.set_outputs({"faithful": faithful, "correct": correct, "judge_errors": judge_errors})
+                    seconds["judge"] = round(time.perf_counter() - t0, 2)
+
+                    question_span.set_outputs({"refused_by": refused_by, "faithful": faithful, "correct": correct})
 
                 r_metadata = mark_matched(d["expected_metadata"], get_metadata(nodes_reranked))
                 found_fused = found(d["expected_metadata"], f_metadata)

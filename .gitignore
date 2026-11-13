@@ -12,6 +12,10 @@ tmp/
 *.lock
 ## except the app's dependency lock: exact versions + hashes for every package (commit it)
 !Pipfile.lock
+## evaluator outputs (local only; the scripts create these folders)
+components/evaluator/runs/
+components/evaluator/index_checks/
+
 ## graphify output (local knowledge graph)
 graphify-out/
 

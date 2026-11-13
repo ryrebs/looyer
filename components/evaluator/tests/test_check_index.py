@@ -6,6 +6,7 @@ temporary folder that pytest deletes afterwards.
 Run from the repo root:
     pipenv run test components/evaluator/tests -v
 """
+
 import json
 
 import pytest
@@ -50,7 +51,7 @@ def index_reads(monkeypatch, tmp_path) -> list:
         return INDEX
 
     monkeypatch.setattr(ci, "index_metadata", read_fake_index)
-    monkeypatch.setattr(ci, "index_version", lambda: INDEX_INFO)
+    monkeypatch.setattr(ci, "get_index_version", lambda: INDEX_INFO)
     monkeypatch.setattr(ci, "INDEX_CHECKS_DIR", tmp_path)
     return reads
 
@@ -106,7 +107,9 @@ def test_negatives_are_left_out():
 
 
 def test_check_passes_when_every_provision_is_in_the_index(index_reads, tmp_path):
-    verified = {"direct_lookup": [entry("dl-01", const("Article III", "Section 12")), entry("dl-10", civil("Article 1318"))]}
+    verified = {
+        "direct_lookup": [entry("dl-01", const("Article III", "Section 12")), entry("dl-10", civil("Article 1318"))]
+    }
     assert ci.check_index(verified) is True
     saved = saved_check(tmp_path)
     assert saved["passed"] is True
@@ -153,7 +156,7 @@ def test_check_runs_again_when_the_answer_key_changes(index_reads):
 def test_check_runs_again_when_the_index_changes(index_reads, monkeypatch):
     verified = {"direct_lookup": [entry("dl-01", const("Article III", "Section 12"))]}
     ci.check_index(verified)
-    monkeypatch.setattr(ci, "index_version", lambda: {"collection": "test_collection", "index_points": 999})
+    monkeypatch.setattr(ci, "get_index_version", lambda: {"collection": "test_collection", "index_points": 999})
     ci.check_index(verified)
     assert len(index_reads) == 2
 

@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -16,10 +17,12 @@ from components import (
     check_llm_server,
     check_qdrant,
     clear_bm25_cache,
+    delete_document_chunks,
     embedding_dimension,
     irac_qa_template,
     irac_refine_template,
     load_document,
+    load_document_meta,
     markdown_chunk_text,
     rag_response_syn,
     rerank,
@@ -30,6 +33,11 @@ from components import (
     transform_mk_cv_code,
 )
 from components.evaluator.evaluate import evaluate
+from components.synthesizer.templates import INSUFFICIENT_CONTEXT, REFUSAL_MESSAGE
+from components.tools.utils import traced
+from components.tracing.config import EXPERIMENT_MAIN, setup_tracing
+
+_logger = logging.getLogger(__name__)
 
 ## Embedding model: in-app or Ollama, from .env (EMBED_API_BASE). See components/embedding/config.py.
 _embed_model = build_embed_model()
@@ -58,6 +66,7 @@ def load_data(path: str) -> ParseData:
 
 
 def load_chunked_embed(path: str):
+    doc_meta = load_document_meta(path)  # first, so an unlisted file fails before parsing
     mk = load_data(path)
     if ".pdf" in mk.path:
         texts = transform_mk_cv_code(mk.content, [_clean_heading_markup, _promote_articles])
@@ -68,6 +77,7 @@ def load_chunked_embed(path: str):
         texts,
         mk.path,
         embed_model=_embed_model,
+        doc_meta=doc_meta,
     )
 
     ## TO BE DEPRECATED (Chroma, replaced by Qdrant)
@@ -79,13 +89,15 @@ def load_chunked_embed(path: str):
     ## The data is about to change: delete BM25's local copy of the chunks, so the next search
     ## rebuilds it from Qdrant. Before writing, so a crash halfway also leaves no stale copy.
     clear_bm25_cache(storage_context.vector_store)
-    ## The file path is the same on every chunk of a document: noise for search, so it is
-    ## kept out of the embedded text (the answer LLM still sees it for citing)
+    ## Re-indexing replaces the document: delete its old chunks (matched on `source`)
+    delete_document_chunks(storage_context, mk.path)
+    ## The file path and law name are the same on every chunk of a document: noise for search, so
+    ## they are kept out of the embedded text (the answer LLM still sees them for citing)
     build_index_from_durable_storage(
         nodes,
         embed_model=_embed_model,
         storage_context=storage_context,
-        excluded_embed_metadata_keys=["source"],
+        excluded_embed_metadata_keys=["source", "law_name"],
     )
 
 
@@ -115,6 +127,9 @@ def _check_embed_model() -> None:
             )
 
 
+@traced(
+    raise_if_not_setup=True
+)  # one trace per question; LlamaIndex steps nest under it. Warns if tracing isn't set up
 def run_rag_pipeline(query: str) -> str:
     ## Built here, not at import: creating it already contacts Qdrant (checks the collection),
     ## so it must come after check_qdrant(). Reuses this module's Qdrant client.
@@ -133,27 +148,33 @@ def run_rag_pipeline(query: str) -> str:
     nodes = rerank(nodes, query)
     ## Drop chunks the reranker scored below RERANK_SCORE_THRESHOLD
     nodes = simpostprocessor(rerank_score_threshold(), nodes)
+    ## Gate refusal: no chunk passed the threshold, so the answer model isn't called
     if not nodes:
-        print("No relevant documents found for your query.")
-        sys.exit(1)
+        return REFUSAL_MESSAGE
 
-    return rag_response_syn(
+    answer = rag_response_syn(
         nodes,
         query,
         llm=build_llm("answer"),
         text_qa_template=irac_qa_template,
         refine_template=irac_refine_template,
     )
+    ## Model refusal: the reply is only the refusal token
+    return REFUSAL_MESSAGE if answer.strip() == INSUFFICIENT_CONTEXT else answer
 
 
 if __name__ == "__main__":
+    ## Status and errors go to logging (stderr); usage text and the answer are the CLI's output (stdout).
+    ## Libraries stay at WARNING so per-request INFO lines (e.g. httpx) don't flood the output.
+    logging.basicConfig(level=logging.WARNING, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    _logger.setLevel(logging.INFO)
     args = sys.argv[1:]
 
     if not args:
         print("Usage:")
         print("  python main.py run-embed <path>   # index a document")
         print("  python main.py <question>         # query the index")
-        print("  python main.py evaluate           # evaluate the goldent texts")
+        print("  python main.py evaluate           # evaluate against the golden dataset")
         sys.exit(0)
     if args[0] == "run-embed":
         if len(args) < 2:
@@ -161,20 +182,21 @@ if __name__ == "__main__":
             sys.exit(1)
         check_qdrant(_qdrant)
         _check_embed_model()
-        print(f"Building index for {args[1]}...")
+        _logger.info("Indexing %s", args[1])
         load_chunked_embed(args[1])
-        print("Done.")
+        _logger.info("Indexed %s", args[1])
     elif args[0] == "evaluate":
         evaluate()
-        print("Done.")
+        _logger.info("Evaluation done")
     else:
         check_qdrant(_qdrant)
         if not _qdrant_collection_exists():
-            print("No index found. Run with 'run-embed' first to build the index.")
+            _logger.error("No index found. Run 'run-embed' first to build the index.")
             sys.exit(1)
         _check_embed_model()
         check_llm_server("hyde")
         check_llm_server("answer")
+        setup_tracing(EXPERIMENT_MAIN)
         question = " ".join(args)
         answer = run_rag_pipeline(question)
         print(f"\n{answer}")

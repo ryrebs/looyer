@@ -9,19 +9,19 @@ Run on its own (e.g. after re-indexing), from the repo root:
     pipenv run python -m components.evaluator.check_index            # skipped if nothing changed
     pipenv run python -m components.evaluator.check_index --force    # check anyway
 """
+
 import json
 import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from components import build_qdrant_client
-from components.audit.audit import _get_collection_from_qdrant
+from components import build_durable_storage_context, build_qdrant_client, load_all_nodes
 from components.evaluator.evaluate import (
     GOLDEN_DATASET_PATH,
-    answer_key_sha256,
     found,
     get_gds,
+    hash_answer_key,
     sha256_of,
     source_name,
 )
@@ -35,13 +35,13 @@ def load_verified() -> dict:
         return get_gds(json.load(f))
 
 
-def index_version() -> dict:
+def get_index_version() -> dict:
     """Which index is checked: the collection and its number of chunks. Cheap: reads no chunks."""
     collection = os.getenv("COLLECTION_NAME")
     return {"collection": collection, "index_points": build_qdrant_client().get_collection(collection).points_count}
 
 
-def check_fingerprint(answer_key: str, index_info: dict) -> str:
+def create_fingerprint(answer_key: str, index_info: dict) -> str:
     """Same answer key + same index = same result, so no need to check again.
 
     A re-index that keeps the same number of chunks isn't detected: use --force after re-indexing.
@@ -60,13 +60,16 @@ def find_check(fingerprint: str) -> Path | None:
 
 def index_metadata() -> list[dict]:
     """Metadata of every indexed chunk, same fields as get_metadata() in evaluate.py (source = file name)."""
+    vector_store = build_durable_storage_context(
+        os.getenv("COLLECTION_NAME"), client=build_qdrant_client()
+    ).vector_store
     return [
         {
             "source": source_name(n.metadata.get("source")),
             "article": n.metadata.get("article"),
             "section": n.metadata.get("section"),
         }
-        for n in _get_collection_from_qdrant()
+        for n in load_all_nodes(vector_store)
     ]
 
 
@@ -121,9 +124,9 @@ def check_index(verified: dict, force: bool = False) -> bool:
 
     force=False: skip when a saved check has the same answer key and index, and return its result.
     """
-    answer_key = answer_key_sha256(verified)
-    index_info = index_version()
-    fingerprint = check_fingerprint(answer_key, index_info)
+    answer_key = hash_answer_key(verified)
+    index_info = get_index_version()
+    fingerprint = create_fingerprint(answer_key, index_info)
 
     previous = None if force else find_check(fingerprint)
     if previous:
@@ -152,5 +155,10 @@ def check_index(verified: dict, force: bool = False) -> bool:
 
 
 if __name__ == "__main__":
+    ## Running reindex and verifying
+    ## pipenv run python -c "import os; from components import build_qdrant_client; print(build_qdrant_client().count(os.getenv('COLLECTION_NAME')).count)"
+    ## pipenv run python main.py run-embed assets/1987_const.html
+    ## pipenv run python -m components.evaluator.check_index
+
     passed = check_index(load_verified(), force="--force" in sys.argv)
     sys.exit(0 if passed else 1)  # set after the full report: tells scripts whether something is missing

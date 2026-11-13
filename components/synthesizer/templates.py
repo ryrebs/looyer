@@ -31,6 +31,8 @@ line INSUFFICIENT_CONTEXT and nothing else.
 ## The exact refusal reply the prompts ask for. Checked in code after synthesis (main.py, the
 ## evaluation): a reply that is only this token means "no provision in the context applies".
 INSUFFICIENT_CONTEXT = "INSUFFICIENT_CONTEXT"
+## What main.py shows the user instead, for both the model's refusal and the threshold gate
+REFUSAL_MESSAGE = "No provision in the indexed laws answers this question, so no answer is given."
 
 _IRAC_QA_TMPL = """\
 LEGAL CONTEXT:

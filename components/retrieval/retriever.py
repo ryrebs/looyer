@@ -70,7 +70,8 @@ class _CheckedHyDE(HyDEQueryTransform):
         return QueryBundle(query_str=query_str, custom_embedding_strs=embedding_strs)
 
 
-def _nodes_from_qdrant(vector_store: QdrantVectorStore) -> list[TextNode]:
+def load_all_nodes(vector_store: QdrantVectorStore) -> list[TextNode]:
+    """Every chunk stored in the collection, read page by page (no vectors)."""
     nodes = []
     offset = None
     while True:
@@ -121,7 +122,7 @@ def _get_bm25_retriever_from_qdrant(vector_store: QdrantVectorStore, k: int) -> 
         retriever.similarity_top_k = k
         return retriever
 
-    nodes = _nodes_from_qdrant(vector_store)
+    nodes = load_all_nodes(vector_store)
     retriever = BM25Retriever.from_defaults(nodes=nodes, similarity_top_k=k)
     retriever.persist(cache_dir)
     return retriever

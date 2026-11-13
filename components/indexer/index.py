@@ -10,6 +10,7 @@ import os
 import chromadb
 from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.core.schema import BaseNode, MetadataMode
+from llama_index.core.vector_stores import MetadataFilter, MetadataFilters
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 
 from ..vector_store.config import build_qdrant_client
@@ -22,6 +23,14 @@ def build_durable_storage_context(collection_name: str, client=None):
     return StorageContext.from_defaults(
         vector_store=vector_store,
     )
+
+
+def delete_document_chunks(storage_context, source: str) -> None:
+    """Delete every indexed chunk of `source` (the path given to run-embed), so re-indexing replaces it."""
+    vector_store = storage_context.vector_store
+    if not vector_store.client.collection_exists(vector_store.collection_name):
+        return  # first index: nothing to delete
+    vector_store.delete_nodes(filters=MetadataFilters(filters=[MetadataFilter(key="source", value=source)]))
 
 
 def build_index_from_durable_storage(

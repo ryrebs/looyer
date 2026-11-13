@@ -1,3 +1,4 @@
+## TO BE DEPRECATED: old experiment script (local Phi-4 via in-process llama.cpp); not used by the app
 import os
 import sys
 import time
